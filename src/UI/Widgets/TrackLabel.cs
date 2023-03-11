@@ -1,5 +1,5 @@
 //  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -23,28 +23,28 @@ using linerider.Tools;
 
 namespace linerider.UI
 {
-    /// <summary>
-    /// Just a label that is intend to go on top of the track
-    /// It changes colors based on nightmode on/off
-    /// </summary>
-    public class TrackLabel : Label
+  /// <summary>
+  /// Just a label that is intend to go on top of the track
+  /// It changes colors based on nightmode on/off
+  /// </summary>
+  public class TrackLabel : Label
+  {
+    protected override Color CurrentColor
     {
-        protected override Color CurrentColor
+      get
+      {
+        if (Settings.NightMode)
         {
-            get
-            {
-                if (Settings.NightMode)
-                {
-                    return Color.FromArgb(255,200,200,200);
-                }
-                else
-                {
-                    return Skin.Colors.Text.Foreground;
-                }
-            }
+          return Color.FromArgb(255,200,200,200);
         }
-        public TrackLabel(ControlBase parent) : base(parent)
+        else
         {
+          return Skin.Colors.Text.Foreground;
         }
+      }
     }
+    public TrackLabel(ControlBase parent) : base(parent)
+    {
+    }
+  }
 }

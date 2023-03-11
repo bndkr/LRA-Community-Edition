@@ -1,5 +1,5 @@
 //  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -25,28 +25,28 @@ using OpenTK.Graphics.OpenGL;
 
 namespace linerider.UI
 {
-    public class LoadingSprite : Sprite
+  public class LoadingSprite : Sprite
+  {
+    public LoadingSprite(ControlBase canvas)
+      : base(canvas)
     {
-        public LoadingSprite(ControlBase canvas)
-            : base(canvas)
-        {
-            IsTabable = false;
-            KeyboardInputEnabled = false;
-            MouseInputEnabled = false;
-        }
-        protected override void Render(Gwen.Skin.SkinBase skin)
-        {
-            ((Gwen.Renderer.OpenTK)skin.Renderer).Flush();
-            var rotation = (Environment.TickCount % 1000) / 1000f;
-            var trans = new Vector3d(X + (Width / 2), Y + (Height / 2), 0);
-            GL.PushMatrix();
-            GL.Translate(trans);
-            GL.Rotate(360 * rotation, Vector3d.UnitZ);
-            GL.Translate(-trans);
-            skin.Renderer.DrawColor = Color.FromArgb(Alpha, 255, 255, 255);
-            skin.Renderer.DrawTexturedRect(m_texture, RenderBounds);
-            ((Gwen.Renderer.OpenTK)skin.Renderer).Flush();
-            GL.PopMatrix();
-        }
+      IsTabable = false;
+      KeyboardInputEnabled = false;
+      MouseInputEnabled = false;
     }
+    protected override void Render(Gwen.Skin.SkinBase skin)
+    {
+      ((Gwen.Renderer.OpenTK)skin.Renderer).Flush();
+      var rotation = (Environment.TickCount % 1000) / 1000f;
+      var trans = new Vector3d(X + (Width / 2), Y + (Height / 2), 0);
+      GL.PushMatrix();
+      GL.Translate(trans);
+      GL.Rotate(360 * rotation, Vector3d.UnitZ);
+      GL.Translate(-trans);
+      skin.Renderer.DrawColor = Color.FromArgb(Alpha, 255, 255, 255);
+      skin.Renderer.DrawTexturedRect(m_texture, RenderBounds);
+      ((Gwen.Renderer.OpenTK)skin.Renderer).Flush();
+      GL.PopMatrix();
+    }
+  }
 }

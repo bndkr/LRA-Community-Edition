@@ -1,5 +1,5 @@
 //  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -22,61 +22,61 @@ using linerider.Utils;
 
 namespace linerider.Game
 {
-    public struct ImmutablePointCollection
+  public struct ImmutablePointCollection
+  {
+    public SimulationPoint this[int index]
     {
-        public SimulationPoint this[int index]
-        {
-            get
-            {
-                return _points[index];
-            }
-        }
-        public int Length
-        {
-            get
-            {
-                return _points.Length;
-            }
-        }
-        private readonly SimulationPoint[] _points;
-        public ImmutablePointCollection(SimulationPoint[] points)
-        {
-            _points = points;
-        }
-        /// <summary>
-        /// fast compare method for two collections so we can bypass
-        /// struct copies
-        /// </summary>
-        public bool CompareTo(ImmutablePointCollection comparand)
-        {
-            int len = _points.Length;
-            if (comparand.Length != len)
-                throw new ArgumentException("Mismatched point collections");
-            for (int i = 0; i < len; i++)
-            {
-                if (!SimulationPoint.FastEquals(
-                    ref _points[i],
-                    ref comparand._points[i]))
-                    return false;
-            }
-            return true;
-        }
-        public SimulationPoint[] Step(bool friction = false)
-        {
-            int len = _points.Length;
-            SimulationPoint[] ret = new SimulationPoint[len];
-            for (int i = 0; i < len; i++)
-            {
-                if (!friction)
-                {
-                    ret[i] = _points[i].Step();
-                }
-                else
-                {
-                    ret[i] = _points[i].StepFriction();
-                }
-            }
-            return ret;
-        }
+      get
+      {
+        return _points[index];
+      }
     }
+    public int Length
+    {
+      get
+      {
+        return _points.Length;
+      }
+    }
+    private readonly SimulationPoint[] _points;
+    public ImmutablePointCollection(SimulationPoint[] points)
+    {
+      _points = points;
+    }
+    /// <summary>
+    /// fast compare method for two collections so we can bypass
+    /// struct copies
+    /// </summary>
+    public bool CompareTo(ImmutablePointCollection comparand)
+    {
+      int len = _points.Length;
+      if (comparand.Length != len)
+        throw new ArgumentException("Mismatched point collections");
+      for (int i = 0; i < len; i++)
+      {
+        if (!SimulationPoint.FastEquals(
+          ref _points[i],
+          ref comparand._points[i]))
+          return false;
+      }
+      return true;
+    }
+    public SimulationPoint[] Step(bool friction = false)
+    {
+      int len = _points.Length;
+      SimulationPoint[] ret = new SimulationPoint[len];
+      for (int i = 0; i < len; i++)
+      {
+        if (!friction)
+        {
+          ret[i] = _points[i].Step();
+        }
+        else
+        {
+          ret[i] = _points[i].StepFriction();
+        }
+      }
+      return ret;
+    }
+  }
 }

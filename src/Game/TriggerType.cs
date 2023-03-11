@@ -1,5 +1,5 @@
 ﻿//  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -20,10 +20,10 @@ using System;
 
 namespace linerider.Game
 {
-    public enum TriggerType
-    {
-        Zoom = 0,
-        BGChange = 1,
-        LineColor = 2,
-    }
+  public enum TriggerType
+  {
+    Zoom = 0,
+    BGChange = 1,
+    LineColor = 2,
+  }
 }

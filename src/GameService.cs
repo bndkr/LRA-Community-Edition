@@ -1,5 +1,5 @@
 ﻿//  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -23,14 +23,14 @@ using System.Text;
 
 namespace linerider
 {
-    public class GameService
-    {
-        protected static MainWindow game;
+  public class GameService
+  {
+    protected static MainWindow game;
 
-        public static void Initialize(MainWindow wnd)
-        {
-            if (game == null)
-                game = wnd;
-        }
+    public static void Initialize(MainWindow wnd)
+    {
+      if (game == null)
+        game = wnd;
     }
+  }
 }

@@ -1,5 +1,5 @@
 ﻿//  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -23,22 +23,22 @@ using System.Text;
 
 namespace linerider.Audio
 {
-    public struct Song
-    {
-        public bool Enabled;
-        public string Location;
-        public float Offset;
+  public struct Song
+  {
+    public bool Enabled;
+    public string Location;
+    public float Offset;
 
-        public Song(string location, float offset)
-        {
-            Location = location;
-            Offset = offset;
-            Enabled = true;
-        }
-        public override string ToString()
-        {
-            //note: .trk spec mandates \r\n newline here
-            return Location + "\r\n" + Offset.ToString(Program.Culture);;
-        }
+    public Song(string location, float offset)
+    {
+      Location = location;
+      Offset = offset;
+      Enabled = true;
     }
+    public override string ToString()
+    {
+      //note: .trk spec mandates \r\n newline here
+      return Location + "\r\n" + Offset.ToString(Program.Culture);;
+    }
+  }
 }

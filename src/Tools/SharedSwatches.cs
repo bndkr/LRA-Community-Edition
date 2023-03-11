@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace linerider.Tools
 {
-    class SharedSwatches
-    {
-        public static Swatch DrawingToolsSwatch = new Swatch();
-        public static Swatch EraserAndSelectToolSwatch = new Swatch();
-    }
+  class SharedSwatches
+  {
+    public static Swatch DrawingToolsSwatch = new Swatch();
+    public static Swatch EraserAndSelectToolSwatch = new Swatch();
+  }
 }

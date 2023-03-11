@@ -1,5 +1,5 @@
 //  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -28,36 +28,36 @@ using linerider.Rendering;
 
 namespace linerider.Drawing
 {
-    public unsafe class GenericVAO : GLArray<GenericVertex>
+  public unsafe class GenericVAO : GLArray<GenericVertex>
+  {
+    public GenericVAO()
     {
-        public GenericVAO()
-        {
-        }
-        protected override void BeginDraw()
-        {
-            GL.EnableClientState(ArrayCap.VertexArray);
-            GL.EnableClientState(ArrayCap.ColorArray);
-            GL.EnableClientState(ArrayCap.TextureCoordArray);
-            fixed (float* ptr1 = &Array.unsafe_array[0].Position.X)
-            fixed (byte* ptr2 = &Array.unsafe_array[0].r)
-            fixed (float* ptr3 = &Array.unsafe_array[0].u)
-            {
-                GL.VertexPointer(2, VertexPointerType.Float, GenericVertex.Size, (IntPtr)ptr1);
-                GL.ColorPointer(4, ColorPointerType.UnsignedByte, GenericVertex.Size, (IntPtr)ptr2);
-                GL.TexCoordPointer(2, TexCoordPointerType.Float, GenericVertex.Size, (IntPtr)ptr3);
-            }
-        }
-        protected override void InternalDraw(PrimitiveType primitive)
-        {
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-            GL.DrawArrays(primitive, 0, Array.Count);
-        }
-        protected override void EndDraw()
-        {
-            GL.DisableClientState(ArrayCap.TextureCoordArray);
-            GL.DisableClientState(ArrayCap.ColorArray);
-            GL.DisableClientState(ArrayCap.VertexArray);
-        }
     }
+    protected override void BeginDraw()
+    {
+      GL.EnableClientState(ArrayCap.VertexArray);
+      GL.EnableClientState(ArrayCap.ColorArray);
+      GL.EnableClientState(ArrayCap.TextureCoordArray);
+      fixed (float* ptr1 = &Array.unsafe_array[0].Position.X)
+      fixed (byte* ptr2 = &Array.unsafe_array[0].r)
+      fixed (float* ptr3 = &Array.unsafe_array[0].u)
+      {
+        GL.VertexPointer(2, VertexPointerType.Float, GenericVertex.Size, (IntPtr)ptr1);
+        GL.ColorPointer(4, ColorPointerType.UnsignedByte, GenericVertex.Size, (IntPtr)ptr2);
+        GL.TexCoordPointer(2, TexCoordPointerType.Float, GenericVertex.Size, (IntPtr)ptr3);
+      }
+    }
+    protected override void InternalDraw(PrimitiveType primitive)
+    {
+      GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+      GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+      GL.DrawArrays(primitive, 0, Array.Count);
+    }
+    protected override void EndDraw()
+    {
+      GL.DisableClientState(ArrayCap.TextureCoordArray);
+      GL.DisableClientState(ArrayCap.ColorArray);
+      GL.DisableClientState(ArrayCap.VertexArray);
+    }
+  }
 }

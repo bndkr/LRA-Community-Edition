@@ -10,12 +10,12 @@ using System.Diagnostics;
 
 namespace linerider.Game
 {
-    public class ClampCamera : ICamera
+  public class ClampCamera : ICamera
+  {
+    protected override Vector2d StepCamera(CameraBoundingBox box, ref Vector2d prev, int frame)
     {
-        protected override Vector2d StepCamera(CameraBoundingBox box, ref Vector2d prev, int frame)
-        {
-            var entry = _frames[frame];
-            return box.Clamp(prev + entry.CameraOffset);
-        }
+      var entry = _frames[frame];
+      return box.Clamp(prev + entry.CameraOffset);
     }
+  }
 }

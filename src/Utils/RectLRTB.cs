@@ -1,5 +1,5 @@
 //  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -21,48 +21,48 @@ using System.Runtime.CompilerServices;
 using linerider.Game;
 namespace linerider.Utils
 {
+  /// <summary>
+  /// lrtb rectangle for use with physics operations
+  /// </summary>
+  public struct RectLRTB
+  {
+    public int top;
+    public int left;
+    public int right;
+    public int bottom;
     /// <summary>
-    /// lrtb rectangle for use with physics operations
+    /// Creates a 3x3 physicsinfo around the point on the simulation grid
     /// </summary>
-    public struct RectLRTB
+    /// <param name="start"></param>
+    public RectLRTB(ref SimulationPoint start)
     {
-        public int top;
-        public int left;
-        public int right;
-        public int bottom;
-        /// <summary>
-        /// Creates a 3x3 physicsinfo around the point on the simulation grid
-        /// </summary>
-        /// <param name="start"></param>
-        public RectLRTB(ref SimulationPoint start)
-        {
-            var gp = SimulationGrid.GetGridPoint(start.Location.X, start.Location.Y);
-            top = gp.Y - 1;
-            bottom = gp.Y + 1;
-            left = gp.X - 1;
-            right = gp.X + 1;
-        }
-        /// <summary>
-        /// Creates a basic rect where left=right=x and top=bottom=y
-        /// </summary>
-        /// <param name="gp"></param>
-        public RectLRTB(GridPoint gp)
-        {
-            top = gp.Y;
-            bottom = gp.Y;
-            left = gp.X;
-            right = gp.X;
-        }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool ContainsPoint(GridPoint cell)
-        {
-            return cell.X >= left && cell.X <= right && cell.Y >= top && cell.Y <= bottom;
-        }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Intersects(RectLRTB cell)
-        {
-            return !(cell.bottom < top || bottom < cell.top
-            || cell.right < left || right < cell.left);
-        }
+      var gp = SimulationGrid.GetGridPoint(start.Location.X, start.Location.Y);
+      top = gp.Y - 1;
+      bottom = gp.Y + 1;
+      left = gp.X - 1;
+      right = gp.X + 1;
     }
+    /// <summary>
+    /// Creates a basic rect where left=right=x and top=bottom=y
+    /// </summary>
+    /// <param name="gp"></param>
+    public RectLRTB(GridPoint gp)
+    {
+      top = gp.Y;
+      bottom = gp.Y;
+      left = gp.X;
+      right = gp.X;
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool ContainsPoint(GridPoint cell)
+    {
+      return cell.X >= left && cell.X <= right && cell.Y >= top && cell.Y <= bottom;
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Intersects(RectLRTB cell)
+    {
+      return !(cell.bottom < top || bottom < cell.top
+      || cell.right < left || right < cell.left);
+    }
+  }
 }

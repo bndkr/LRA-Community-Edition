@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace linerider.Addons
 {
-    public class AddonManager
+  public class AddonManager
+  {
+    public static void Initialize(MainWindow mainWindow)
     {
-        public static void Initialize(MainWindow mainWindow)
-        {
-            MagicAnimator.Initialize(mainWindow);
-        }
+      MagicAnimator.Initialize(mainWindow);
     }
+  }
 }

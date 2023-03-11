@@ -1,5 +1,5 @@
 ﻿//  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -20,28 +20,28 @@ using OpenTK;
 
 namespace linerider.Game
 {
-    public class SceneryLine : GameLine
+  public class SceneryLine : GameLine
+  {
+    public override LineType Type
     {
-        public override LineType Type
-        {
-            get
-            {
-                return LineType.Scenery;
-            }
-        }
-        public override System.Drawing.Color Color => Settings.Lines.SceneryLine;
-        public SceneryLine(Vector2d p1, Vector2d p2) 
-        {
-            Position = p1;
-            Position2 = p2;
-        }
-        public override GameLine Clone()
-        {
-            return new SceneryLine(Position, Position2)
-            {
-                ID = ID,
-                Width = Width
-            };
-        }
+      get
+      {
+        return LineType.Scenery;
+      }
     }
+    public override System.Drawing.Color Color => Settings.Lines.SceneryLine;
+    public SceneryLine(Vector2d p1, Vector2d p2) 
+    {
+      Position = p1;
+      Position2 = p2;
+    }
+    public override GameLine Clone()
+    {
+      return new SceneryLine(Position, Position2)
+      {
+        ID = ID,
+        Width = Width
+      };
+    }
+  }
 }

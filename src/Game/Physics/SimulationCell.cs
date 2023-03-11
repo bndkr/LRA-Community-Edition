@@ -8,16 +8,16 @@ using System.Collections;
 
 namespace linerider
 {
-    public class SimulationCell : LineContainer<StandardLine>
+  public class SimulationCell : LineContainer<StandardLine>
+  {
+    public SimulationCell FullClone()
     {
-        public SimulationCell FullClone()
-        {
-            var ret = new SimulationCell();
-            foreach (var l in this)
-            {
-                ret.AddLine((StandardLine)l.Clone());
-            }
-            return ret;
-        }
+      var ret = new SimulationCell();
+      foreach (var l in this)
+      {
+        ret.AddLine((StandardLine)l.Clone());
+      }
+      return ret;
     }
+  }
 }

@@ -1,5 +1,5 @@
 ﻿//  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -25,72 +25,72 @@ using OpenTK;
 
 namespace linerider.UI
 {
-    public class ZoomSlider : VerticalSlider
+  public class ZoomSlider : VerticalSlider
+  {
+    private Editor _editor;
+    private Tooltip _tooltip;
+    public ZoomSlider(ControlBase parent, Editor editor) : base(parent)
     {
-        private Editor _editor;
-        private Tooltip _tooltip;
-        public ZoomSlider(ControlBase parent, Editor editor) : base(parent)
+      TooltipDelay = 0;
+      IsTabable = false;
+      KeyboardInputEnabled = false;
+      _editor = editor;
+      Height = 125;
+      Width = 30;
+      _tooltip = new Tooltip(parent.GetCanvas());
+      _tooltip.IsHidden = true;
+      Positioner = (o) =>
+      {
+        return new System.Drawing.Point(Parent.Width - Width, (Parent.Height - Height) - 50);
+      };
+      SetRange(Constants.MinimumZoom, Constants.MaxZoom);
+      ValueChanged += (o, e) =>
+      {
+        if (Held)
         {
-            TooltipDelay = 0;
-            IsTabable = false;
-            KeyboardInputEnabled = false;
-            _editor = editor;
-            Height = 125;
-            Width = 30;
-            _tooltip = new Tooltip(parent.GetCanvas());
-            _tooltip.IsHidden = true;
-            Positioner = (o) =>
-            {
-                return new System.Drawing.Point(Parent.Width - Width, (Parent.Height - Height) - 50);
-            };
-            SetRange(Constants.MinimumZoom, Constants.MaxZoom);
-            ValueChanged += (o, e) =>
-            {
-                if (Held)
-                {
-                    var val = Value;
-                    _editor.Zoom = (float)MathHelper.Clamp(Value, Constants.MinimumZoom, Settings.Local.MaxZoom);
-                }
-                UpdateTooltip();
-            };
-            m_SliderBar.HoverEnter += (o, e) =>
-            {
-                _tooltip.IsHidden = false;
-                UpdateTooltip();
-            };
-            HoverEnter += (o, e) =>
-            {
-                _tooltip.IsHidden = false;
-                UpdateTooltip();
-            };
-            m_SliderBar.HoverLeave += (o, e) =>
-            {
-                _tooltip.IsHidden = true;
-            };
-            HoverLeave += (o, e) =>
-            {
-                _tooltip.IsHidden = true;
-            };
-            m_SliderBar.Pressed += (o, e) =>
-            {
-                _tooltip.IsHidden = false;
-                UpdateTooltip();
-            };
-            Value = editor.Zoom;
-            OnThink += (o,e)=>
-            {
-                Value = editor.Zoom;
-            };
+          var val = Value;
+          _editor.Zoom = (float)MathHelper.Clamp(Value, Constants.MinimumZoom, Settings.Local.MaxZoom);
         }
-        public void UpdateTooltip()
-        {
-            if (!_tooltip.IsHidden)
-            {
-                var loc = LocalPosToCanvas(new Point(0, m_SliderBar.Y));
-                _tooltip.Text = Math.Round(_editor.Zoom, 2) + "x"; ;
-                _tooltip.Layout();
-                _tooltip.SetPosition(loc.X - _tooltip.Width, loc.Y);
-            }
-        }
+        UpdateTooltip();
+      };
+      m_SliderBar.HoverEnter += (o, e) =>
+      {
+        _tooltip.IsHidden = false;
+        UpdateTooltip();
+      };
+      HoverEnter += (o, e) =>
+      {
+        _tooltip.IsHidden = false;
+        UpdateTooltip();
+      };
+      m_SliderBar.HoverLeave += (o, e) =>
+      {
+        _tooltip.IsHidden = true;
+      };
+      HoverLeave += (o, e) =>
+      {
+        _tooltip.IsHidden = true;
+      };
+      m_SliderBar.Pressed += (o, e) =>
+      {
+        _tooltip.IsHidden = false;
+        UpdateTooltip();
+      };
+      Value = editor.Zoom;
+      OnThink += (o,e)=>
+      {
+        Value = editor.Zoom;
+      };
     }
+    public void UpdateTooltip()
+    {
+      if (!_tooltip.IsHidden)
+      {
+        var loc = LocalPosToCanvas(new Point(0, m_SliderBar.Y));
+        _tooltip.Text = Math.Round(_editor.Zoom, 2) + "x"; ;
+        _tooltip.Layout();
+        _tooltip.SetPosition(loc.X - _tooltip.Width, loc.Y);
+      }
+    }
+  }
 }

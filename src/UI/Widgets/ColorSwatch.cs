@@ -1,5 +1,5 @@
 //  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -23,48 +23,48 @@ using linerider.Tools;
 using linerider.Utils;
 namespace linerider.UI
 {
-    public class ColorSwatch : WidgetContainer
+  public class ColorSwatch : WidgetContainer
+  {
+    private SwatchColorButton _btnblue;
+    private SwatchColorButton _btnred;
+    private SwatchColorButton _btngreem;
+    private Texture _swatchtexture;
+    public ColorSwatch(ControlBase canvas) : base(canvas)
     {
-        private SwatchColorButton _btnblue;
-        private SwatchColorButton _btnred;
-        private SwatchColorButton _btngreem;
-        private Texture _swatchtexture;
-        public ColorSwatch(ControlBase canvas) : base(canvas)
-        {
-            AutoSizeToContents = true;
-            ShouldDrawBackground = false;
-            Setup();
-        }
-        public override void Think()
-        {
-            base.Think();
-            var hide = !Tools.CurrentTools.SelectedTool.ShowSwatch;
-            foreach (var child in Children)
-            {
-                child.IsHidden = hide;
-            }
-        }
-        private SwatchColorButton AddButton(LineType lineType)
-        {
-            var ret = new SwatchColorButton(this, lineType)
-            {
-                Dock = Dock.Left,
-                Margin = Margin.One
-            };
-            ret.SetImage(_swatchtexture);
-            return ret;
-        }
-        private void Setup()
-        {
-            _swatchtexture = Skin.Renderer.CreateTexture(GameResources.swatch);
-            _btnblue = AddButton(LineType.Blue);
-            _btnred = AddButton(LineType.Red);
-            _btngreem = AddButton(LineType.Scenery);
-        }
-        public override void Dispose()
-        {
-            base.Dispose();
-            _swatchtexture.Dispose();
-        }
+      AutoSizeToContents = true;
+      ShouldDrawBackground = false;
+      Setup();
     }
+    public override void Think()
+    {
+      base.Think();
+      var hide = !Tools.CurrentTools.SelectedTool.ShowSwatch;
+      foreach (var child in Children)
+      {
+        child.IsHidden = hide;
+      }
+    }
+    private SwatchColorButton AddButton(LineType lineType)
+    {
+      var ret = new SwatchColorButton(this, lineType)
+      {
+        Dock = Dock.Left,
+        Margin = Margin.One
+      };
+      ret.SetImage(_swatchtexture);
+      return ret;
+    }
+    private void Setup()
+    {
+      _swatchtexture = Skin.Renderer.CreateTexture(GameResources.swatch);
+      _btnblue = AddButton(LineType.Blue);
+      _btnred = AddButton(LineType.Red);
+      _btngreem = AddButton(LineType.Scenery);
+    }
+    public override void Dispose()
+    {
+      base.Dispose();
+      _swatchtexture.Dispose();
+    }
+  }
 }

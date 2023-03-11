@@ -1,5 +1,5 @@
 //  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -25,69 +25,69 @@ using linerider.Game;
 
 namespace linerider.Tools
 {
-    public class Swatch : GameService
+  public class Swatch : GameService
+  {
+    private float _greenmultiplier = 1;
+    private float _redmultiplier = 1;
+    public float GreenMultiplier
     {
-        private float _greenmultiplier = 1;
-        private float _redmultiplier = 1;
-        public float GreenMultiplier
-        {
-            get
-            {
-                return _greenmultiplier;
-            }
-            set
-            {
-                _greenmultiplier = value;
-            }
-        }
-
-        public int RedMultiplier
-        {
-            get
-            {
-                return (int)Math.Round(_redmultiplier);
-            }
-            set
-            {
-                _redmultiplier = value;
-            }
-        }
-        public const int MaxRedMultiplier = 3;
-        public const int MinRedMultiplier = 1;
-        public const int MaxGreenMultiplier = 3;
-        public const float MinGreenMultiplier = 0.5f;
-        public LineType Selected { get; set; } = LineType.Blue;
-        public void IncrementSelectedMultiplier()
-        {
-            if (CurrentTools.SelectedTool != CurrentTools.EraserTool && 
-                CurrentTools.SelectedTool != CurrentTools.SelectTool &&
-                CurrentTools.SelectedTool != CurrentTools.MoveTool &&
-            CurrentTools.SelectedTool.ShowSwatch)
-            {
-                var sw = CurrentTools.SelectedTool.Swatch;
-                switch (Selected)
-                {
-                    case LineType.Red:
-                        {
-                            var mul = sw.RedMultiplier;
-                            mul++;
-                            if (mul > Swatch.MaxRedMultiplier)
-                                mul = Swatch.MinRedMultiplier;
-                            sw.RedMultiplier = mul;
-                        }
-                        break;
-                    case LineType.Scenery:
-                        {
-                            var mul = sw.GreenMultiplier;
-                            mul++;
-                            mul = (float)Math.Floor(mul);
-                            if (mul > Swatch.MaxGreenMultiplier)
-                                mul = Swatch.MinGreenMultiplier;
-                            sw.GreenMultiplier = mul;
-                        }
-                        break;
-                }
-            }
-        }
+      get
+      {
+        return _greenmultiplier;
+      }
+      set
+      {
+        _greenmultiplier = value;
+      }
     }
+
+    public int RedMultiplier
+    {
+      get
+      {
+        return (int)Math.Round(_redmultiplier);
+      }
+      set
+      {
+        _redmultiplier = value;
+      }
+    }
+    public const int MaxRedMultiplier = 3;
+    public const int MinRedMultiplier = 1;
+    public const int MaxGreenMultiplier = 3;
+    public const float MinGreenMultiplier = 0.5f;
+    public LineType Selected { get; set; } = LineType.Blue;
+    public void IncrementSelectedMultiplier()
+    {
+      if (CurrentTools.SelectedTool != CurrentTools.EraserTool && 
+        CurrentTools.SelectedTool != CurrentTools.SelectTool &&
+        CurrentTools.SelectedTool != CurrentTools.MoveTool &&
+      CurrentTools.SelectedTool.ShowSwatch)
+      {
+        var sw = CurrentTools.SelectedTool.Swatch;
+        switch (Selected)
+        {
+          case LineType.Red:
+            {
+              var mul = sw.RedMultiplier;
+              mul++;
+              if (mul > Swatch.MaxRedMultiplier)
+                mul = Swatch.MinRedMultiplier;
+              sw.RedMultiplier = mul;
+            }
+            break;
+          case LineType.Scenery:
+            {
+              var mul = sw.GreenMultiplier;
+              mul++;
+              mul = (float)Math.Floor(mul);
+              if (mul > Swatch.MaxGreenMultiplier)
+                mul = Swatch.MinGreenMultiplier;
+              sw.GreenMultiplier = mul;
+            }
+            break;
+        }
+      }
+    }
+  }
 }

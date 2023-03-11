@@ -1,5 +1,5 @@
 ﻿//  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -20,103 +20,103 @@ using OpenTK;
 using linerider.Game;
 namespace linerider.Game
 {
-    public class RedLine : StandardLine
+  public class RedLine : StandardLine
+  {
+    private Vector2d _acc;
+    public const double ConstAcc = 0.1;
+    private int _multiplier = 1;
+    public int Multiplier
     {
-        private Vector2d _acc;
-        public const double ConstAcc = 0.1;
-        private int _multiplier = 1;
-        public int Multiplier
-        {
-            get
-            {
-                return _multiplier;
-            }
-            set
-            {
-                _multiplier = value;
-                CalculateConstants();
-            }
-        }
-        public override LineType Type
-        {
-            get
-            {
-                return LineType.Red;
-            }
-        }
-        public override System.Drawing.Color Color => Settings.Lines.AccelerationLine;
-        protected RedLine() : base()
-        {
-        }
-        public RedLine(Vector2d p1, Vector2d p2, bool inv = false) : base(p1, p2, inv) { }
-        public override void CalculateConstants()
-        {
-            base.CalculateConstants();
-            _acc = DiffNormal * (ConstAcc * _multiplier);
-            _acc = inv ? _acc.PerpendicularRight : _acc.PerpendicularLeft;
-        }
-        public override bool Interact(ref SimulationPoint p)
-        {
-            if (base.Interact(ref p))
-            {
-                p = p.Replace(p.Location,p.Previous + _acc);
-                return true;
-            }
-            return false;
-        }
-        public override GameLine Clone()
-        {
-            LineTrigger trigger = null;
-            if (Trigger != null)
-            {
-                trigger = new LineTrigger()
-                {
-                    ZoomTrigger = Trigger.ZoomTrigger,
-                    ZoomFrames = Trigger.ZoomFrames,
-                    ZoomTarget = Trigger.ZoomTarget
-                };
-            }
-            return new RedLine()
-            {
-                ID = ID,
-                Difference = Difference,
-                DiffNormal = DiffNormal,
-                Distance = Distance,
-                DotScalar = DotScalar,
-                Extension = Extension,
-                ExtensionRatio = ExtensionRatio,
-                inv = inv,
-                Position = Position,
-                Position2 = Position2,
-                Trigger = trigger,
-                _acc = _acc,
-                _multiplier = _multiplier
-            };
-        }
-        public static RedLine CloneFromBlue(StandardLine standardLine)
-        {
-            LineTrigger trigger = null;
-            if (standardLine.Trigger != null)
-            {
-                trigger = new LineTrigger()
-                {
-                    ZoomTrigger = standardLine.Trigger.ZoomTrigger,
-                    ZoomFrames = standardLine.Trigger.ZoomFrames,
-                    ZoomTarget = standardLine.Trigger.ZoomTarget
-                };
-            }
-            RedLine newLine = new RedLine()
-            {
-                ID = standardLine.ID,
-                Extension = standardLine.Extension,
-                inv = standardLine.inv,
-                Position = standardLine.Position,
-                Position2 = standardLine.Position2,
-                Trigger = trigger,
-                _multiplier = 1
-            };
-            newLine.CalculateConstants();
-            return newLine;
-        }
+      get
+      {
+        return _multiplier;
+      }
+      set
+      {
+        _multiplier = value;
+        CalculateConstants();
+      }
     }
+    public override LineType Type
+    {
+      get
+      {
+        return LineType.Red;
+      }
+    }
+    public override System.Drawing.Color Color => Settings.Lines.AccelerationLine;
+    protected RedLine() : base()
+    {
+    }
+    public RedLine(Vector2d p1, Vector2d p2, bool inv = false) : base(p1, p2, inv) { }
+    public override void CalculateConstants()
+    {
+      base.CalculateConstants();
+      _acc = DiffNormal * (ConstAcc * _multiplier);
+      _acc = inv ? _acc.PerpendicularRight : _acc.PerpendicularLeft;
+    }
+    public override bool Interact(ref SimulationPoint p)
+    {
+      if (base.Interact(ref p))
+      {
+        p = p.Replace(p.Location,p.Previous + _acc);
+        return true;
+      }
+      return false;
+    }
+    public override GameLine Clone()
+    {
+      LineTrigger trigger = null;
+      if (Trigger != null)
+      {
+        trigger = new LineTrigger()
+        {
+          ZoomTrigger = Trigger.ZoomTrigger,
+          ZoomFrames = Trigger.ZoomFrames,
+          ZoomTarget = Trigger.ZoomTarget
+        };
+      }
+      return new RedLine()
+      {
+        ID = ID,
+        Difference = Difference,
+        DiffNormal = DiffNormal,
+        Distance = Distance,
+        DotScalar = DotScalar,
+        Extension = Extension,
+        ExtensionRatio = ExtensionRatio,
+        inv = inv,
+        Position = Position,
+        Position2 = Position2,
+        Trigger = trigger,
+        _acc = _acc,
+        _multiplier = _multiplier
+      };
+    }
+    public static RedLine CloneFromBlue(StandardLine standardLine)
+    {
+      LineTrigger trigger = null;
+      if (standardLine.Trigger != null)
+      {
+        trigger = new LineTrigger()
+        {
+          ZoomTrigger = standardLine.Trigger.ZoomTrigger,
+          ZoomFrames = standardLine.Trigger.ZoomFrames,
+          ZoomTarget = standardLine.Trigger.ZoomTarget
+        };
+      }
+      RedLine newLine = new RedLine()
+      {
+        ID = standardLine.ID,
+        Extension = standardLine.Extension,
+        inv = standardLine.inv,
+        Position = standardLine.Position,
+        Position2 = standardLine.Position2,
+        Trigger = trigger,
+        _multiplier = 1
+      };
+      newLine.CalculateConstants();
+      return newLine;
+    }
+  }
 }

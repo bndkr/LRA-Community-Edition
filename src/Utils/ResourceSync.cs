@@ -1,5 +1,5 @@
 //  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -27,185 +27,185 @@ using System.Runtime.CompilerServices;
 
 namespace linerider.Utils
 {
-    public sealed class ResourceSync
+  public sealed class ResourceSync
+  {
+    public sealed class ResourceLock : IDisposable
     {
-        public sealed class ResourceLock : IDisposable
+      private bool _disposed = false;
+      private bool _upgradableread = false;
+      private bool _read;
+      private bool _write;
+      private ResourceSync _parent;
+      public bool WaitedOn
+      {
+        get
         {
-            private bool _disposed = false;
-            private bool _upgradableread = false;
-            private bool _read;
-            private bool _write;
-            private ResourceSync _parent;
-            public bool WaitedOn
-            {
-                get
-                {
-                    var l = _parent._lock;
-                    return (l.WaitingReadCount > 0 ||
-                    l.WaitingUpgradeCount > 0 ||
-                    l.WaitingWriteCount > 0);
-                }
-            }
-            /// <summary>
-            /// Creates a disposable object around a recently acquired lock
-            /// </summary>
-            public ResourceLock(
-                bool read,
-                bool write,
-                bool upgradableread,
-                ResourceSync parent)
-            {
-                _read = read;
-                _write = write;
-                _parent = parent;
-                _upgradableread = upgradableread;
-            }
-            public static ResourceLock Reader(ResourceSync parent)
-            {
-                return new ResourceLock(true, false, false, parent);
-            }
-            public static ResourceLock Writer(ResourceSync parent)
-            {
-                return new ResourceLock(false, true, false, parent);
-            }
-            public static ResourceLock UpgradableReader(ResourceSync parent)
-            {
-                return new ResourceLock(false, false, true, parent);
-            }
-            public void UpgradeToWriter()
-            {
-                if (_disposed)
-                    return;
-                if (!_upgradableread)
-                {
-                    throw new InvalidOperationException("Attempt to upgrade a non upgradable resource reader");
-                }
-                if (_write)
-                {
-                    throw new InvalidOperationException("Attempt to upgrade an already upgraded resource reader");
-                }
-                _parent.UnsafeEnterWrite();
-                _write = true;
-            }
-            /// <summary>
-            /// Drops and reacquires the lock until nobody is waiting on us.
-            /// </summary>
-            public void ReleaseWaiting()
-            {
-                int count = 0;
-                while (WaitedOn)
-                {
-                    Debug.Assert(count++ != 10000,"Wait release in possible infinite loop");
-                    Release();
-                    Acquire();
-                }
-            }
-            private void Acquire()
-            {
-                if (_upgradableread)
-                {
-                    _parent.UnsafeEnterUpgradableRead();
-                    if (_write)
-                    {
-                        _parent.UnsafeEnterWrite();
-                    }
-                }
-                else if (_read)
-                {
-                    _parent.UnsafeEnterRead();
-                }
-                else if (_write)
-                {
-                    _parent.UnsafeEnterWrite();
-                }
-                else
-                {
-                    throw new Exception("Unknown resourcesync type");
-                }
-            }
-            private void Release()
-            {
-                if (_upgradableread)
-                {
-                    _parent.UnsafeExitUpgradableRead();
-                }
-                else if (_read)
-                {
-                    _parent.UnsafeExitRead();
-                }
-                else if (_write)
-                {
-                    _parent.UnsafeExitWrite();
-                }
-                else
-                {
-                    throw new Exception("Unknown resourcesync type");
-                }
-            }
-            public void Dispose()
-            {
-                if (_disposed)
-                    return;
-                Release();
-                _disposed = true;
-            }
+          var l = _parent._lock;
+          return (l.WaitingReadCount > 0 ||
+          l.WaitingUpgradeCount > 0 ||
+          l.WaitingWriteCount > 0);
         }
-        private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
-        public ResourceLock TryAcquireRead()
+      }
+      /// <summary>
+      /// Creates a disposable object around a recently acquired lock
+      /// </summary>
+      public ResourceLock(
+        bool read,
+        bool write,
+        bool upgradableread,
+        ResourceSync parent)
+      {
+        _read = read;
+        _write = write;
+        _parent = parent;
+        _upgradableread = upgradableread;
+      }
+      public static ResourceLock Reader(ResourceSync parent)
+      {
+        return new ResourceLock(true, false, false, parent);
+      }
+      public static ResourceLock Writer(ResourceSync parent)
+      {
+        return new ResourceLock(false, true, false, parent);
+      }
+      public static ResourceLock UpgradableReader(ResourceSync parent)
+      {
+        return new ResourceLock(false, false, true, parent);
+      }
+      public void UpgradeToWriter()
+      {
+        if (_disposed)
+          return;
+        if (!_upgradableread)
         {
-            if (_lock.TryEnterReadLock(0))
-            {
-                return ResourceLock.Reader(this);
-            }
-            return null;
+          throw new InvalidOperationException("Attempt to upgrade a non upgradable resource reader");
         }
-        public ResourceLock AcquireRead()
+        if (_write)
         {
-            UnsafeEnterRead();
-            return ResourceLock.Reader(this);
+          throw new InvalidOperationException("Attempt to upgrade an already upgraded resource reader");
         }
-        public ResourceLock AcquireUpgradableRead()
+        _parent.UnsafeEnterWrite();
+        _write = true;
+      }
+      /// <summary>
+      /// Drops and reacquires the lock until nobody is waiting on us.
+      /// </summary>
+      public void ReleaseWaiting()
+      {
+        int count = 0;
+        while (WaitedOn)
         {
-            UnsafeEnterUpgradableRead();
-            return ResourceLock.UpgradableReader(this);
+          Debug.Assert(count++ != 10000,"Wait release in possible infinite loop");
+          Release();
+          Acquire();
         }
-        public ResourceLock AcquireWrite()
+      }
+      private void Acquire()
+      {
+        if (_upgradableread)
         {
-            UnsafeEnterWrite();
-            return ResourceLock.Writer(this);
+          _parent.UnsafeEnterUpgradableRead();
+          if (_write)
+          {
+            _parent.UnsafeEnterWrite();
+          }
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void UnsafeEnterRead()
+        else if (_read)
         {
-            _lock.EnterReadLock();
+          _parent.UnsafeEnterRead();
         }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void UnsafeExitRead()
+        else if (_write)
         {
-            _lock.ExitReadLock();
+          _parent.UnsafeEnterWrite();
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void UnsafeEnterWrite()
+        else
         {
-            _lock.EnterWriteLock();
+          throw new Exception("Unknown resourcesync type");
         }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void UnsafeExitWrite()
+      }
+      private void Release()
+      {
+        if (_upgradableread)
         {
-            _lock.ExitWriteLock();
+          _parent.UnsafeExitUpgradableRead();
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void UnsafeEnterUpgradableRead()
+        else if (_read)
         {
-            _lock.EnterUpgradeableReadLock();
+          _parent.UnsafeExitRead();
         }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void UnsafeExitUpgradableRead()
+        else if (_write)
         {
-            _lock.ExitUpgradeableReadLock();
+          _parent.UnsafeExitWrite();
         }
+        else
+        {
+          throw new Exception("Unknown resourcesync type");
+        }
+      }
+      public void Dispose()
+      {
+        if (_disposed)
+          return;
+        Release();
+        _disposed = true;
+      }
     }
+    private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+    public ResourceLock TryAcquireRead()
+    {
+      if (_lock.TryEnterReadLock(0))
+      {
+        return ResourceLock.Reader(this);
+      }
+      return null;
+    }
+    public ResourceLock AcquireRead()
+    {
+      UnsafeEnterRead();
+      return ResourceLock.Reader(this);
+    }
+    public ResourceLock AcquireUpgradableRead()
+    {
+      UnsafeEnterUpgradableRead();
+      return ResourceLock.UpgradableReader(this);
+    }
+    public ResourceLock AcquireWrite()
+    {
+      UnsafeEnterWrite();
+      return ResourceLock.Writer(this);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void UnsafeEnterRead()
+    {
+      _lock.EnterReadLock();
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void UnsafeExitRead()
+    {
+      _lock.ExitReadLock();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void UnsafeEnterWrite()
+    {
+      _lock.EnterWriteLock();
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void UnsafeExitWrite()
+    {
+      _lock.ExitWriteLock();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void UnsafeEnterUpgradableRead()
+    {
+      _lock.EnterUpgradeableReadLock();
+    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void UnsafeExitUpgradableRead()
+    {
+      _lock.ExitUpgradeableReadLock();
+    }
+  }
 }

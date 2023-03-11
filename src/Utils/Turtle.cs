@@ -1,5 +1,5 @@
 ﻿//  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -23,83 +23,83 @@ using System.Text;
 using OpenTK;
 namespace linerider.Utils
 {
+  /// <summary>
+  /// This is my pet turtle. I wrote him cause I'm bad at math.
+  /// His name is Sam
+  /// </summary>
+  class Turtle
+  {
+    private Vector2d _point = new Vector2d(0, 0);
     /// <summary>
-    /// This is my pet turtle. I wrote him cause I'm bad at math.
-    /// His name is Sam
+    /// The current point the turtle is at.
+    /// Calling setter resets angle;
     /// </summary>
-    class Turtle
+    public Vector2d Point
     {
-        private Vector2d _point = new Vector2d(0, 0);
-        /// <summary>
-        /// The current point the turtle is at.
-        /// Calling setter resets angle;
-        /// </summary>
-        public Vector2d Point
-        {
-            get
-            {
-                return _point;
-            }
-            set
-            {
-                _point = value;
-                _degrees = 0;
-            }
-        }
-        /// <summary>
-        /// The current point the turtle is at.
-        /// </summary>
-        public Vector2d PointNoReset
-        {
-            get
-            {
-                return _point;
-            }
-            set
-            {
-                _point = value;
-            }
-        }
-        public double X { get { return _point.X; } }
-        public double Y { get { return _point.Y; } }
-        public double Degrees
-        {
-            get
-            {
-                return new Angle(_degrees).Degrees;
-            }
-        }
-        private double _degrees = 0;
-        public Turtle(Vector2d startpoint)
-        {
-            Point = startpoint;
-        }
-
-        private static Vector2d CalculateLine(Vector2d position, double degrees, double length)
-        {
-            var ret = position;
-            var radians = MathHelper.DegreesToRadians(degrees);
-            var sin = Math.Sin(radians);
-            var cos = Math.Cos(radians);
-            ret.X = ret.X + (length * cos);
-            ret.Y = ret.Y + (length * sin);
-            return ret;
-        }
-        /// <summary>
-        /// moves relative to the previous command, retaining angle of the last move command
-        /// </summary>
-        public void Move(double degrees, double length)
-        {
-            _degrees += degrees;
-            _point = CalculateLine(Point, _degrees, length);
-        }
-        /// <summary>
-        /// moves relative to the previous command, using the static angle used
-        /// </summary>
-        public void MoveStaticDegrees(double degrees, double length)
-        {
-            _degrees += degrees;
-            _point = CalculateLine(Point, degrees, length);
-        }
+      get
+      {
+        return _point;
+      }
+      set
+      {
+        _point = value;
+        _degrees = 0;
+      }
     }
+    /// <summary>
+    /// The current point the turtle is at.
+    /// </summary>
+    public Vector2d PointNoReset
+    {
+      get
+      {
+        return _point;
+      }
+      set
+      {
+        _point = value;
+      }
+    }
+    public double X { get { return _point.X; } }
+    public double Y { get { return _point.Y; } }
+    public double Degrees
+    {
+      get
+      {
+        return new Angle(_degrees).Degrees;
+      }
+    }
+    private double _degrees = 0;
+    public Turtle(Vector2d startpoint)
+    {
+      Point = startpoint;
+    }
+
+    private static Vector2d CalculateLine(Vector2d position, double degrees, double length)
+    {
+      var ret = position;
+      var radians = MathHelper.DegreesToRadians(degrees);
+      var sin = Math.Sin(radians);
+      var cos = Math.Cos(radians);
+      ret.X = ret.X + (length * cos);
+      ret.Y = ret.Y + (length * sin);
+      return ret;
+    }
+    /// <summary>
+    /// moves relative to the previous command, retaining angle of the last move command
+    /// </summary>
+    public void Move(double degrees, double length)
+    {
+      _degrees += degrees;
+      _point = CalculateLine(Point, _degrees, length);
+    }
+    /// <summary>
+    /// moves relative to the previous command, using the static angle used
+    /// </summary>
+    public void MoveStaticDegrees(double degrees, double length)
+    {
+      _degrees += degrees;
+      _point = CalculateLine(Point, degrees, length);
+    }
+  }
 }

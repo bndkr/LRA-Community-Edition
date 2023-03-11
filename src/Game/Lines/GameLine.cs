@@ -1,5 +1,5 @@
 ﻿//  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -21,65 +21,85 @@ using System;
 using linerider.Game;
 using linerider.Utils;
 using System.Drawing;
+using System.Runtime.CompilerServices;
+
 namespace linerider.Game
 {
-    public abstract class GameLine : Line
+  public abstract class GameLine : Line
+  {
+    public const int UninitializedID = int.MinValue;
+    public int ID = UninitializedID;
+    public float Width = 1;
+    public SelectionState SelectionState = SelectionState.None;
+    public abstract Color Color { get; }
+    public abstract LineType Type { get; }
+    /// <summary>
+    /// "Left" 
+    /// </summary>
+    public virtual Vector2d Start
     {
-        public const int UninitializedID = int.MinValue;
-        public int ID = UninitializedID;
-        public float Width = 1;
-        public SelectionState SelectionState = SelectionState.None;
-        public abstract Color Color { get; }
-        public abstract LineType Type { get; }
-        /// <summary>
-        /// "Left" 
-        /// </summary>
-        public virtual Vector2d Start
-        {
-            get { return Position; }
-        }
-        /// <summary>
-        /// "Right"
-        /// </summary>
-        public virtual Vector2d End
-        {
-            get { return Position2; }
-        }
-
-        public override string ToString()
-        {
-            return "ID: " +
-                ID +
-                " {" +
-                Math.Round(Position.X, 1) +
-                ", " +
-                Math.Round(Position.Y, 1) +
-                "}, {" +
-                Math.Round(Position2.X) +
-                ", " +
-                Math.Round(Position2.Y) +
-                "}";
-        }
-
-        public override int GetHashCode()
-        {
-            return ID;
-        }
-
-        public Color GetColor()
-        {
-            switch (Type)
-            {
-                case LineType.Blue:
-                    return Settings.Lines.StandardLine;
-                case LineType.Red:
-                    return Settings.Lines.AccelerationLine;
-                case LineType.Scenery:
-                    return Settings.Lines.SceneryLine;
-                default:
-                    throw new Exception("Unable to get the color for this line, its type is unknown");
-            }
-        }
-        public abstract GameLine Clone();
+      get { return Position; }
     }
+
+    public virtual double GetX1()
+    {
+      return Position.X;
+    }
+    public virtual double GetX2()
+    {
+      return Position2.X;
+    }
+    public virtual double GetY1()
+    {
+      return Position.Y;
+    }
+    public virtual double GetY2()
+    {
+      return Position2.Y;
+    }
+
+    /// <summary>
+    /// "Right"
+    /// </summary>
+    public virtual Vector2d End
+    {
+      get { return Position2; }
+    }
+
+    public override string ToString()
+    {
+      return "ID: " +
+        ID +
+        " {" +
+        Math.Round(Position.X, 1) +
+        ", " +
+        Math.Round(Position.Y, 1) +
+        "}, {" +
+        Math.Round(Position2.X) +
+        ", " +
+        Math.Round(Position2.Y) +
+        "}";
+    }
+
+    public override int GetHashCode()
+    {
+      return ID;
+    }
+
+    public Color GetColor()
+    {
+      switch (Type)
+      {
+        case LineType.Blue:
+          return Settings.Lines.StandardLine;
+        case LineType.Red:
+          return Settings.Lines.AccelerationLine;
+        case LineType.Scenery:
+          return Settings.Lines.SceneryLine;
+        default:
+          throw new Exception("Unable to get the color for this line, its type is unknown");
+      }
+    }
+    public abstract GameLine Clone();
+  }
 }

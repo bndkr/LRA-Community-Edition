@@ -1,5 +1,5 @@
 ﻿//  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -22,71 +22,71 @@ using Gwen.Controls;
 
 namespace linerider.UI
 {
-    public class ImageButton : Button
+  public class ImageButton : Button
+  {
+    public byte Alpha = 255;
+    private Texture tx1;
+    private Texture _overridetex = null;
+    private bool _override = false;
+
+    public ImageButton(ControlBase canvas) : base(canvas) { AutoSizeToContents = false; }
+
+    public override void Dispose()
     {
-        public byte Alpha = 255;
-        private Texture tx1;
-        private Texture _overridetex = null;
-        private bool _override = false;
-
-        public ImageButton(ControlBase canvas) : base(canvas) { AutoSizeToContents = false; }
-
-        public override void Dispose()
-        {
-            if (tx1 != null)
-                tx1.Dispose();
-            if (_overridetex != null)
-                _overridetex.Dispose();
-            base.Dispose();
-        }
-        public void SetImage(Bitmap bmp)
-        {
-            if (m_texture != null)
-                m_texture.Dispose();
-            Texture tx = new Texture(Skin.Renderer);
-
-            Gwen.Renderer.OpenTK.LoadTextureInternal(tx, bmp);
-            m_texture = tx;
-            tx1 = tx;
-        }
-        public void DisableImageOverride()
-        {
-            _override = false;
-        }
-        public void EnableImageOverride()
-        {
-            _override = true;
-        }
-        public void SetOverride(Bitmap bitmap)
-        {
-            if (_overridetex != null)
-                _overridetex.Dispose();
-            Texture tx = new Texture(Skin.Renderer);
-
-            Gwen.Renderer.OpenTK.LoadTextureInternal(tx, bitmap);
-            _overridetex = tx;
-        }
-        public override void SetImage(string textureName, bool center = false)
-        {
-            if (m_texture != null)
-                m_texture.Dispose();
-            m_texture = new Texture(Skin.Renderer);
-            m_texture.Load(textureName);
-        }
-
-        protected override void Render(Gwen.Skin.SkinBase skin)
-        {
-            skin.Renderer.DrawColor = Color.FromArgb(IsDepressed ? 64 : (IsHovered ? 128 : Alpha), 255, 255, 255);
-            if (_override && _overridetex != null)
-            {
-                skin.Renderer.DrawTexturedRect(_overridetex, RenderBounds);
-            }
-            else
-            {
-                skin.Renderer.DrawTexturedRect(m_texture, RenderBounds);
-            }
-        }
-
-        private Texture m_texture;
+      if (tx1 != null)
+        tx1.Dispose();
+      if (_overridetex != null)
+        _overridetex.Dispose();
+      base.Dispose();
     }
+    public void SetImage(Bitmap bmp)
+    {
+      if (m_texture != null)
+        m_texture.Dispose();
+      Texture tx = new Texture(Skin.Renderer);
+
+      Gwen.Renderer.OpenTK.LoadTextureInternal(tx, bmp);
+      m_texture = tx;
+      tx1 = tx;
+    }
+    public void DisableImageOverride()
+    {
+      _override = false;
+    }
+    public void EnableImageOverride()
+    {
+      _override = true;
+    }
+    public void SetOverride(Bitmap bitmap)
+    {
+      if (_overridetex != null)
+        _overridetex.Dispose();
+      Texture tx = new Texture(Skin.Renderer);
+
+      Gwen.Renderer.OpenTK.LoadTextureInternal(tx, bitmap);
+      _overridetex = tx;
+    }
+    public override void SetImage(string textureName, bool center = false)
+    {
+      if (m_texture != null)
+        m_texture.Dispose();
+      m_texture = new Texture(Skin.Renderer);
+      m_texture.Load(textureName);
+    }
+
+    protected override void Render(Gwen.Skin.SkinBase skin)
+    {
+      skin.Renderer.DrawColor = Color.FromArgb(IsDepressed ? 64 : (IsHovered ? 128 : Alpha), 255, 255, 255);
+      if (_override && _overridetex != null)
+      {
+        skin.Renderer.DrawTexturedRect(_overridetex, RenderBounds);
+      }
+      else
+      {
+        skin.Renderer.DrawTexturedRect(m_texture, RenderBounds);
+      }
+    }
+
+    private Texture m_texture;
+  }
 }

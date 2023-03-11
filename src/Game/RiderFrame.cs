@@ -1,5 +1,5 @@
 //  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -29,24 +29,24 @@ using System.Diagnostics;
 
 namespace linerider.Game
 {
-    /// <summary>
-    /// Full information on a frame.
-    /// </summary>
-    public class RiderFrame
+  /// <summary>
+  /// Full information on a frame.
+  /// </summary>
+  public class RiderFrame
+  {
+    public int FrameID;
+    public Rider State;
+    public List<int> Diagnosis;
+    public int IterationID = 6;
+    public RiderFrame()
     {
-        public int FrameID;
-        public Rider State;
-        public List<int> Diagnosis;
-        public int IterationID = 6;
-        public RiderFrame()
-        {
-        }
-        public RiderFrame(int frameid, Rider state, List<int> diagnosis, int iterationid)
-        {
-            FrameID = frameid;
-            State = state;
-            Diagnosis = diagnosis;
-            IterationID = iterationid;
-        }
     }
+    public RiderFrame(int frameid, Rider state, List<int> diagnosis, int iterationid)
+    {
+      FrameID = frameid;
+      State = state;
+      Diagnosis = diagnosis;
+      IterationID = iterationid;
+    }
+  }
 }

@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace linerider.Addons
 {
-    public class BaseAddon
-    {
-        protected static MainWindow window;
-        public BaseAddon() {}
+  public class BaseAddon
+  {
+    protected static MainWindow window;
+    public BaseAddon() {}
 
-        public static void Initialize(MainWindow mainWindow)
-        {
-            BaseAddon.window = mainWindow;
-        }
+    public static void Initialize(MainWindow mainWindow)
+    {
+      BaseAddon.window = mainWindow;
     }
+  }
 }

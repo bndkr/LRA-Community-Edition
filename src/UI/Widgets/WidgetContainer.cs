@@ -1,5 +1,5 @@
 //  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -23,14 +23,14 @@ using linerider.Tools;
 
 namespace linerider.UI
 {
-    public class WidgetContainer : Panel
+  public class WidgetContainer : Panel
+  {
+    public WidgetContainer(ControlBase parent) : base(parent)
     {
-        public WidgetContainer(ControlBase parent) : base(parent)
-        {
-            MouseInputEnabled = false;
-            AutoSizeToContents = true;
-            ShouldDrawBackground = false;
-            BackgroundAlpha = 15;
-        }
+      MouseInputEnabled = false;
+      AutoSizeToContents = true;
+      ShouldDrawBackground = false;
+      BackgroundAlpha = 15;
     }
+  }
 }

@@ -1,5 +1,5 @@
 ﻿//  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -24,27 +24,27 @@ using OpenTK;
 using linerider.Game;
 namespace linerider.IO.SOL
 {
-    internal class SOLFile
+  internal class SOLFile
+  {
+    public Amf0Object RootObject = new Amf0Object();
+    public SOLFile(string location)
     {
-        public Amf0Object RootObject = new Amf0Object();
-        public SOLFile(string location)
-        {
-            var bytes = File.ReadAllBytes(location);
-            BigEndianReader br = new BigEndianReader(bytes);
-            ///HEADER///
-            br.ReadInt16();//sol_version
-            br.ReadInt32();//file length
-            if (br.ReadInt32() != 0x5443534F)//TCSO
-                throw new Exception("Invalid magic number, maybe this isn't an SOL file?");
-            br.ReadBytes(6);//padding
-            RootObject.name = Encoding.ASCII.GetString(br.ReadBytes(br.ReadInt16()));//shared object name
-            if (RootObject.name != "savedLines")
-                throw new Exception("invalid root object");
-            if (br.ReadInt32() != 0)
-                throw new Exception("Invalid AMF version");//amf version, we only support 0o
-                                                           ///items///			
-            Amf0 amf = new Amf0(br);
-            RootObject.data = amf.ReadAmf0(true);
-        }
+      var bytes = File.ReadAllBytes(location);
+      BigEndianReader br = new BigEndianReader(bytes);
+      ///HEADER///
+      br.ReadInt16();//sol_version
+      br.ReadInt32();//file length
+      if (br.ReadInt32() != 0x5443534F)//TCSO
+        throw new Exception("Invalid magic number, maybe this isn't an SOL file?");
+      br.ReadBytes(6);//padding
+      RootObject.name = Encoding.ASCII.GetString(br.ReadBytes(br.ReadInt16()));//shared object name
+      if (RootObject.name != "savedLines")
+        throw new Exception("invalid root object");
+      if (br.ReadInt32() != 0)
+        throw new Exception("Invalid AMF version");//amf version, we only support 0o
+                               ///items///			
+      Amf0 amf = new Amf0(br);
+      RootObject.data = amf.ReadAmf0(true);
     }
+  }
 }

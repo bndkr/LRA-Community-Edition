@@ -26,5 +26,5 @@ void main()
 
 	float alpha = 1.0 - grid_alph(world_position, 1.0);
 	color = vec4(0.0, 0.0, 1.0, alpha);
-    gl_FragColor = color;
+  gl_FragColor = color;
 }

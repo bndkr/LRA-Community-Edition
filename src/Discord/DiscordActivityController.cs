@@ -9,14 +9,14 @@ using Discord;
 
 namespace linerider
 {
-    class DiscordActivityController
+  class DiscordActivityController
+  {
+    public Discord.Discord discord;
+
+    public void initDiscord()
     {
-        public Discord.Discord discord;
-
-        public void initDiscord()
-        {
-            discord = new Discord.Discord(506953593945980933, (UInt64)Discord.CreateFlags.NoRequireDiscord); //Create discord for game sdk activity
-        }
-
+      discord = new Discord.Discord(506953593945980933, (UInt64)Discord.CreateFlags.NoRequireDiscord); //Create discord for game sdk activity
     }
+
+  }
 }

@@ -1,5 +1,5 @@
 //  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -26,42 +26,42 @@ using linerider.Game;
 using linerider.Utils;
 namespace linerider.Game
 {
-    /// <summary>
-    /// An overlay around an existing simulation grid.
-    /// This grid's cells are checked first before the underlying grid.
-    /// </summary>
-    public class SimulationGridOverlay : ISimulationGrid
+  /// <summary>
+  /// An overlay around an existing simulation grid.
+  /// This grid's cells are checked first before the underlying grid.
+  /// </summary>
+  public class SimulationGridOverlay : ISimulationGrid
+  {
+    public ResourceSync Sync
     {
-        public ResourceSync Sync
-        {
-            get { return BaseGrid.Sync; }
-        }
-        public SimulationGrid BaseGrid;
-        public ConcurrentDictionary<GridPoint, SimulationCell> Overlay = new ConcurrentDictionary<GridPoint, SimulationCell>();
-        public SimulationCell GetCell(int x, int y)
-        {
-            SimulationCell cell;
-            var gp = new GridPoint(x, y);
-            if (!Overlay.TryGetValue(gp, out cell))
-                return BaseGrid.GetCell(x, y);
-            return cell;
-        }
-        /// <summary>
-        /// adds an overlay if it does not already exist for that point
-        /// </summary>
-        /// <returns>true if the overlay was added</returns>
-        public bool AddOverlay(GridPoint point, SimulationCell cell)
-        {
-            if (!Overlay.ContainsKey(point))
-            {
-                Overlay[point] = cell;
-                return true;
-            }
-            return false;
-        }
-        public void Clear()
-        {
-            Overlay.Clear();
-        }
+      get { return BaseGrid.Sync; }
     }
+    public SimulationGrid BaseGrid;
+    public ConcurrentDictionary<GridPoint, SimulationCell> Overlay = new ConcurrentDictionary<GridPoint, SimulationCell>();
+    public SimulationCell GetCell(int x, int y)
+    {
+      SimulationCell cell;
+      var gp = new GridPoint(x, y);
+      if (!Overlay.TryGetValue(gp, out cell))
+        return BaseGrid.GetCell(x, y);
+      return cell;
+    }
+    /// <summary>
+    /// adds an overlay if it does not already exist for that point
+    /// </summary>
+    /// <returns>true if the overlay was added</returns>
+    public bool AddOverlay(GridPoint point, SimulationCell cell)
+    {
+      if (!Overlay.ContainsKey(point))
+      {
+        Overlay[point] = cell;
+        return true;
+      }
+      return false;
+    }
+    public void Clear()
+    {
+      Overlay.Clear();
+    }
+  }
 }

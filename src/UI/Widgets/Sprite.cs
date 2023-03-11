@@ -1,5 +1,5 @@
 //  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -25,38 +25,38 @@ using OpenTK.Graphics.OpenGL;
 
 namespace linerider.UI
 {
-    public class Sprite : ControlBase
+  public class Sprite : ControlBase
+  {
+    public byte Alpha = 255;
+    protected Texture m_texture;
+    public Sprite(ControlBase canvas)
+      : base(canvas)
     {
-        public byte Alpha = 255;
-        protected Texture m_texture;
-        public Sprite(ControlBase canvas)
-            : base(canvas)
-        {
-            IsTabable = false;
-            KeyboardInputEnabled = false;
-            MouseInputEnabled = false;
-        }
-
-        public void SetImage(Bitmap bmp)
-        {
-            if (m_texture != null)
-                m_texture.Dispose();
-
-            Texture tx = new Texture(Skin.Renderer);
-            Gwen.Renderer.OpenTK.LoadTextureInternal(tx, bmp);
-            m_texture = tx;
-            Size = bmp.Size;
-        }
-        protected override void Render(Gwen.Skin.SkinBase skin)
-        {
-            skin.Renderer.DrawColor = Color.FromArgb(Alpha, 255, 255, 255);
-            skin.Renderer.DrawTexturedRect(m_texture, RenderBounds);
-        }
-        public override void Dispose()
-        {
-            if (m_texture != null)
-                m_texture.Dispose();
-            base.Dispose();
-        }
+      IsTabable = false;
+      KeyboardInputEnabled = false;
+      MouseInputEnabled = false;
     }
+
+    public void SetImage(Bitmap bmp)
+    {
+      if (m_texture != null)
+        m_texture.Dispose();
+
+      Texture tx = new Texture(Skin.Renderer);
+      Gwen.Renderer.OpenTK.LoadTextureInternal(tx, bmp);
+      m_texture = tx;
+      Size = bmp.Size;
+    }
+    protected override void Render(Gwen.Skin.SkinBase skin)
+    {
+      skin.Renderer.DrawColor = Color.FromArgb(Alpha, 255, 255, 255);
+      skin.Renderer.DrawTexturedRect(m_texture, RenderBounds);
+    }
+    public override void Dispose()
+    {
+      if (m_texture != null)
+        m_texture.Dispose();
+      base.Dispose();
+    }
+  }
 }

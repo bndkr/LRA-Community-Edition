@@ -1,5 +1,5 @@
 //  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -25,106 +25,106 @@ using linerider.Tools;
 
 namespace linerider.UI
 {
-    public class TrackInfoBar : WidgetContainer
+  public class TrackInfoBar : WidgetContainer
+  {
+    private Editor _editor;
+    private TrackLabel _title;
+    private TrackLabel _linecount;
+    private TrackLabel _selectioncount;
+    public TrackInfoBar(ControlBase parent, Editor editor) : base(parent)
     {
-        private Editor _editor;
-        private TrackLabel _title;
-        private TrackLabel _linecount;
-        private TrackLabel _selectioncount;
-        public TrackInfoBar(ControlBase parent, Editor editor) : base(parent)
-        {
-            Dock = Dock.Left;
-            _editor = editor;
-            AutoSizeToContents = true;
-            Setup();
-            OnThink += Think;
-        }
-        private void Think(object sender, EventArgs e)
-        {
-            var rec = Settings.Local.RecordingMode;
-            _title.IsHidden = rec;
-            _linecount.IsHidden = rec;
-        }
-        private void Setup()
-        {
-            _title = new TrackLabel(this)
-            {
-                Dock = Dock.Top,
-                TextRequest = (o, current) =>
-                {
-                    return GetTitle();
-                }
-            };
-            _linecount = new TrackLabel(this)
-            {
-                Dock = Dock.Top,
-                Margin = new Margin(0, 5, 0, 0),
-                TextRequest = (o, current) =>
-                {
-                    var u = (int)_linecount.UserData;
-                    if (u != _editor.LineCount)
-                    {
-                        _linecount.UserData = _editor.LineCount;
-                        var lineCountText = "Lines: " + _editor.LineCount.ToString();
-                        return lineCountText;
-                    }
-                    return current;
-                },
-                UserData = 0,
-                Text = "Lines: 0",
-            };
-            _selectioncount = new TrackLabel(this)
-            {
-                Dock = Dock.Top,
-                Margin = new Margin(0, 5, 0, 0),
-                TextRequest = (o, current) =>
-                {
-                    if (!_editor.Paused || TrackRecorder.Recording)
-                    {
-                        return "";
-                    }
-                    var u = (int)_selectioncount.UserData;
-                    if (CurrentTools.SelectedTool == CurrentTools.SelectTool)
-                    {
-                        var linecount = ((SelectTool)(CurrentTools.SelectedTool)).GetLineSelectionsInBox().Count;
-                        if (linecount == 0) { linecount = ((SelectTool)(CurrentTools.SelectedTool)).GetLineSelections().Count; }
-
-                        if (u != linecount)
-                        {
-                            if (linecount > 0)
-                            {
-                                _selectioncount.UserData = linecount;
-                                return "Selected: " + linecount.ToString();
-                            }
-                            return "";
-                        }
-                    }
-                    return current;
-                },
-                UserData = 0,
-            };
-        }
-        private ImageButton CreateButton(Bitmap image, string tooltip)
-        {
-            ImageButton btn = new ImageButton(this);
-            btn.SetImage(image);
-            btn.SetSize(32, 32);
-            btn.Tooltip = tooltip;
-            return btn;
-        }
-        private string GetTitle()
-        {
-            string name = _editor.Name;
-            var changes = _editor.TrackChanges;
-            if (changes > 0)
-            {
-                name += " (*)";
-                name += changes == 1 ? "\n" + (changes) + " change" : "\n" + (changes) + " changes";
-            }
-            if (changes > Settings.autosaveChanges) {
-                name += "\nAutosave enabled!";
-            }
-            return name;
-        }
+      Dock = Dock.Left;
+      _editor = editor;
+      AutoSizeToContents = true;
+      Setup();
+      OnThink += Think;
     }
+    private void Think(object sender, EventArgs e)
+    {
+      var rec = Settings.Local.RecordingMode;
+      _title.IsHidden = rec;
+      _linecount.IsHidden = rec;
+    }
+    private void Setup()
+    {
+      _title = new TrackLabel(this)
+      {
+        Dock = Dock.Top,
+        TextRequest = (o, current) =>
+        {
+          return GetTitle();
+        }
+      };
+      _linecount = new TrackLabel(this)
+      {
+        Dock = Dock.Top,
+        Margin = new Margin(0, 5, 0, 0),
+        TextRequest = (o, current) =>
+        {
+          var u = (int)_linecount.UserData;
+          if (u != _editor.LineCount)
+          {
+            _linecount.UserData = _editor.LineCount;
+            var lineCountText = "Lines: " + _editor.LineCount.ToString();
+            return lineCountText;
+          }
+          return current;
+        },
+        UserData = 0,
+        Text = "Lines: 0",
+      };
+      _selectioncount = new TrackLabel(this)
+      {
+        Dock = Dock.Top,
+        Margin = new Margin(0, 5, 0, 0),
+        TextRequest = (o, current) =>
+        {
+          if (!_editor.Paused || TrackRecorder.Recording)
+          {
+            return "";
+          }
+          var u = (int)_selectioncount.UserData;
+          if (CurrentTools.SelectedTool == CurrentTools.SelectTool)
+          {
+            var linecount = ((SelectTool)(CurrentTools.SelectedTool)).GetLineSelectionsInBox().Count;
+            if (linecount == 0) { linecount = ((SelectTool)(CurrentTools.SelectedTool)).GetLineSelections().Count; }
+
+            if (u != linecount)
+            {
+              if (linecount > 0)
+              {
+                _selectioncount.UserData = linecount;
+                return "Selected: " + linecount.ToString();
+              }
+              return "";
+            }
+          }
+          return current;
+        },
+        UserData = 0,
+      };
+    }
+    private ImageButton CreateButton(Bitmap image, string tooltip)
+    {
+      ImageButton btn = new ImageButton(this);
+      btn.SetImage(image);
+      btn.SetSize(32, 32);
+      btn.Tooltip = tooltip;
+      return btn;
+    }
+    private string GetTitle()
+    {
+      string name = _editor.Name;
+      var changes = _editor.TrackChanges;
+      if (changes > 0)
+      {
+        name += " (*)";
+        name += changes == 1 ? "\n" + (changes) + " change" : "\n" + (changes) + " changes";
+      }
+      if (changes > Settings.autosaveChanges) {
+        name += "\nAutosave enabled!";
+      }
+      return name;
+    }
+  }
 }

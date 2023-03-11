@@ -1,5 +1,5 @@
 ﻿//  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -24,38 +24,38 @@ using OpenTK;
 using System.Drawing;
 namespace linerider.Drawing
 {
-    /// <summary>
-    /// A generic vertex with values for pos, color, and texture uv
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct GenericVertex
+  /// <summary>
+  /// A generic vertex with values for pos, color, and texture uv
+  /// </summary>
+  [StructLayout(LayoutKind.Sequential, Pack = 1)]
+  public struct GenericVertex
+  {
+    public static readonly int Size = Marshal.SizeOf(typeof(GenericVertex));
+    public Vector2 Position;
+    public byte r, g, b, a;
+    public float u, v;
+
+    public GenericVertex(float x, float y, Color color, float _u = 0.5f, float _v = 0.5f)
     {
-        public static readonly int Size = Marshal.SizeOf(typeof(GenericVertex));
-        public Vector2 Position;
-        public byte r, g, b, a;
-        public float u, v;
+      Position = new Vector2(x, y);
+      r = color.R;
+      g = color.G;
+      b = color.B;
+      a = color.A;
+      u = _u;
+      v = _v;
+    }
 
-        public GenericVertex(float x, float y, Color color, float _u = 0.5f, float _v = 0.5f)
-        {
-            Position = new Vector2(x, y);
-            r = color.R;
-            g = color.G;
-            b = color.B;
-            a = color.A;
-            u = _u;
-            v = _v;
-        }
-
-        public GenericVertex(Vector2 pos, Color color, float _u = 0.5f, float _v = 0.5f)
-        {
-            Position = pos;
-            u = _u;
-            v = _v;
-            r = color.R;
-            g = color.G;
-            b = color.B;
-            a = color.A;
-        }
+    public GenericVertex(Vector2 pos, Color color, float _u = 0.5f, float _v = 0.5f)
+    {
+      Position = pos;
+      u = _u;
+      v = _v;
+      r = color.R;
+      g = color.G;
+      b = color.B;
+      a = color.A;
+    }
 		public GenericVertex SetColor(Color color)
 		{
 			var ret = this;
@@ -65,5 +65,5 @@ namespace linerider.Drawing
 			ret.a = color.A;
 			return ret;
 		}
-    }
+  }
 }

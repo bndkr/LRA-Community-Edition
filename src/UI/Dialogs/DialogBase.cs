@@ -8,15 +8,15 @@ using linerider.Utils;
 
 namespace linerider.UI
 {
-    public abstract class DialogBase : WindowControl
+  public abstract class DialogBase : WindowControl
+  {
+    protected GameCanvas _canvas;
+    protected Editor _editor;
+    public DialogBase(GameCanvas parent, Editor editor) : base(parent)
     {
-        protected GameCanvas _canvas;
-        protected Editor _editor;
-        public DialogBase(GameCanvas parent, Editor editor) : base(parent)
-        {
-            DeleteOnClose = true;
-            _canvas = parent;
-            _editor = editor;
-        }
+      DeleteOnClose = true;
+      _canvas = parent;
+      _editor = editor;
     }
+  }
 }

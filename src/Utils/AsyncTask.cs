@@ -1,5 +1,5 @@
 //  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -28,71 +28,71 @@ using System.Runtime.CompilerServices;
 
 namespace linerider.Utils
 {
-    public class AsyncTask : IDisposable
+  public class AsyncTask : IDisposable
+  {
+    private Action _action;
+    private Action _oncompletion;
+    private Func<bool> _condition;
+    private Task _task = null;
+    private readonly object _sync = new object();
+    private bool running = false;
+    public AsyncTask(Action action, Func<bool> condition, Action oncompletion)
     {
-        private Action _action;
-        private Action _oncompletion;
-        private Func<bool> _condition;
-        private Task _task = null;
-        private readonly object _sync = new object();
-        private bool running = false;
-        public AsyncTask(Action action, Func<bool> condition, Action oncompletion)
-        {
-            _action = action;
-            _condition = condition;
-            _oncompletion = oncompletion;
-        }
-        private void ThreadProc()
-        {
-            while (true)
-            {
-                lock (_sync)
-                {
-                    if (!_condition())
-                    {
-                        running = false;
-                        break;
-                    }
-                }
-                _action.Invoke();
-            }
-            _oncompletion();
-
-        }
-        public void RunSynchronously()
-        {
-            bool wait = false;
-            lock (_sync)
-            {
-                if (running)
-                {
-                    wait = true;
-                }
-            }
-            if (wait)
-            {
-                _task.Wait();
-            }
-            else
-            {
-                ThreadProc();
-            }
-        }
-        public void EnsureRunning()
-        {
-            lock (_sync)
-            {
-                if (!running)
-                {
-                    running = true;
-                    _task?.Dispose();
-                    _task = Task.Run((Action)ThreadProc);
-                }
-            }
-        }
-        public void Dispose()
-        {
-            _task?.Dispose();
-        }
+      _action = action;
+      _condition = condition;
+      _oncompletion = oncompletion;
     }
+    private void ThreadProc()
+    {
+      while (true)
+      {
+        lock (_sync)
+        {
+          if (!_condition())
+          {
+            running = false;
+            break;
+          }
+        }
+        _action.Invoke();
+      }
+      _oncompletion();
+
+    }
+    public void RunSynchronously()
+    {
+      bool wait = false;
+      lock (_sync)
+      {
+        if (running)
+        {
+          wait = true;
+        }
+      }
+      if (wait)
+      {
+        _task.Wait();
+      }
+      else
+      {
+        ThreadProc();
+      }
+    }
+    public void EnsureRunning()
+    {
+      lock (_sync)
+      {
+        if (!running)
+        {
+          running = true;
+          _task?.Dispose();
+          _task = Task.Run((Action)ThreadProc);
+        }
+      }
+    }
+    public void Dispose()
+    {
+      _task?.Dispose();
+    }
+  }
 }

@@ -1,5 +1,5 @@
 //  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -18,15 +18,15 @@
 
 namespace linerider
 {
-    public enum LineType
-    {
-        Scenery = 0,
-        Blue = 1,
-        Red = 2,
-        
-        /// <summary>
-        /// Used for the swatch selector
-        /// </summary>
-        All = 3
-    }
+  public enum LineType
+  {
+    Scenery = 0,
+    Blue = 1,
+    Red = 2,
+    
+    /// <summary>
+    /// Used for the swatch selector
+    /// </summary>
+    All = 3
+  }
 }

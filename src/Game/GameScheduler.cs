@@ -1,5 +1,5 @@
 ﻿//  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -22,90 +22,90 @@ using linerider.Utils;
 
 namespace linerider
 {
-    public class GameScheduler
+  public class GameScheduler
+  {
+    private Stopwatch sw = new Stopwatch();
+    private double lastupdate = 0;
+    private double updateperiod = 1;
+    private bool reset = true;
+    public float UpdatePeriod
     {
-        private Stopwatch sw = new Stopwatch();
-        private double lastupdate = 0;
-        private double updateperiod = 1;
-        private bool reset = true;
-        public float UpdatePeriod
-        {
-            get
-            {
-                return (float)updateperiod;
-            }
-        }
-        public int UpdatesPerSecond
-        {
-            get
-            {
-                return (int)(1.0 / updateperiod);
-            }
-            set
-            {
-                if (UpdatesPerSecond != value)
-                {
-                    updateperiod = 1.0 / value;
-                    reset = true;
-                }
-            }
-        }
-
-        public float ElapsedPercent
-        {
-            get
-            {
-                var totalelapsed = sw.Elapsed.TotalSeconds;
-                var elapsed = totalelapsed - lastupdate;
-                return (float)(elapsed / updateperiod);
-            }
-        }
-        public GameScheduler()
-        {
-            DefaultSpeed();
-        }
-        public void DefaultSpeed()
-        {
-            UpdatesPerSecond = (int)Math.Round(Utils.Constants.PhysicsRate * Settings.DefaultPlayback);
-        }
-
-        public int UnqueueUpdates()
-        {
-            if (updateperiod == 0) return 1;
-            if (!sw.IsRunning)
-                sw.Start();
-            int updates = 0;
-            var totalelapsed = sw.Elapsed.TotalSeconds;
-            var elapsed = totalelapsed - lastupdate;
-            if (reset)
-            {
-                reset = false;
-                lastupdate = totalelapsed;
-                return 0;
-            }
-            else
-            {
-                while (elapsed >= updateperiod)
-                {
-                    elapsed -= updateperiod;
-                    updates++;
-                    int cap = (int)(2 + 
-                    (UpdatesPerSecond / (float)Constants.PhysicsRate));
-                    if (updates >= cap)
-                    {
-                        elapsed = Math.Min(elapsed, updateperiod * cap);
-                        break;
-                    }
-                }
-            }
-            if (updates > 0)
-                lastupdate = totalelapsed - elapsed;
-            return updates;
-        }
-
-        public void Reset()
-        {
-            reset = true;
-        }
+      get
+      {
+        return (float)updateperiod;
+      }
     }
+    public int UpdatesPerSecond
+    {
+      get
+      {
+        return (int)(1.0 / updateperiod);
+      }
+      set
+      {
+        if (UpdatesPerSecond != value)
+        {
+          updateperiod = 1.0 / value;
+          reset = true;
+        }
+      }
+    }
+
+    public float ElapsedPercent
+    {
+      get
+      {
+        var totalelapsed = sw.Elapsed.TotalSeconds;
+        var elapsed = totalelapsed - lastupdate;
+        return (float)(elapsed / updateperiod);
+      }
+    }
+    public GameScheduler()
+    {
+      DefaultSpeed();
+    }
+    public void DefaultSpeed()
+    {
+      UpdatesPerSecond = (int)Math.Round(Utils.Constants.PhysicsRate * Settings.DefaultPlayback);
+    }
+
+    public int UnqueueUpdates()
+    {
+      if (updateperiod == 0) return 1;
+      if (!sw.IsRunning)
+        sw.Start();
+      int updates = 0;
+      var totalelapsed = sw.Elapsed.TotalSeconds;
+      var elapsed = totalelapsed - lastupdate;
+      if (reset)
+      {
+        reset = false;
+        lastupdate = totalelapsed;
+        return 0;
+      }
+      else
+      {
+        while (elapsed >= updateperiod)
+        {
+          elapsed -= updateperiod;
+          updates++;
+          int cap = (int)(2 + 
+          (UpdatesPerSecond / (float)Constants.PhysicsRate));
+          if (updates >= cap)
+          {
+            elapsed = Math.Min(elapsed, updateperiod * cap);
+            break;
+          }
+        }
+      }
+      if (updates > 0)
+        lastupdate = totalelapsed - elapsed;
+      return updates;
+    }
+
+    public void Reset()
+    {
+      reset = true;
+    }
+  }
 }

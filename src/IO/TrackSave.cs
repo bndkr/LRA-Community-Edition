@@ -1,10 +1,10 @@
 ﻿using System;
 namespace linerider.IO
 {
-    public class TrackSave
+  public class TrackSave
+  {
+    public TrackSave()
     {
-        public TrackSave()
-        {
-        }
     }
+  }
 }

@@ -1,5 +1,5 @@
 //  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -34,105 +34,105 @@ using System.Diagnostics;
 
 namespace linerider.Game
 {
+  /// <summary>
+  /// playback scrubber/buffer manager
+  /// properties:
+  /// has full access to track.RiderStates at all times
+  /// calls thread safe access to createtrackreader to simulate
+  /// </summary>
+  public partial class Timeline
+  {
+    private readonly ResourceSync changesync = new ResourceSync();
+    private HashSet<GridPoint> _changedcells = new HashSet<GridPoint>();
+    private SimulationGridOverlay _savedcells = new SimulationGridOverlay();
+    private int _first_invalid_frame = 1;
     /// <summary>
-    /// playback scrubber/buffer manager
-    /// properties:
-    /// has full access to track.RiderStates at all times
-    /// calls thread safe access to createtrackreader to simulate
+    /// Backs up all the grid cells on a line for the recompute engine.
     /// </summary>
-    public partial class Timeline
+    public void SaveCells(Vector2d start, Vector2d end)
     {
-        private readonly ResourceSync changesync = new ResourceSync();
-        private HashSet<GridPoint> _changedcells = new HashSet<GridPoint>();
-        private SimulationGridOverlay _savedcells = new SimulationGridOverlay();
-        private int _first_invalid_frame = 1;
-        /// <summary>
-        /// Backs up all the grid cells on a line for the recompute engine.
-        /// </summary>
-        public void SaveCells(Vector2d start, Vector2d end)
+      var positions = SimulationGrid.GetGridPositions(start, end, _track.Grid.GridVersion);
+      using (changesync.AcquireWrite())
+      {
+        foreach (var cellpos in positions)
         {
-            var positions = SimulationGrid.GetGridPositions(start, end, _track.Grid.GridVersion);
-            using (changesync.AcquireWrite())
-            {
-                foreach (var cellpos in positions)
-                {
-                    _savedcells.AddOverlay(cellpos.Point, _track.Grid.GetCell(cellpos.X, cellpos.Y));
-                    _changedcells.Add(cellpos.Point);
-                }
-            }
+          _savedcells.AddOverlay(cellpos.Point, _track.Grid.GetCell(cellpos.X, cellpos.Y));
+          _changedcells.Add(cellpos.Point);
         }
-        /// <summary>
-        /// Checks for the earliest changed frame and notifies the recompute 
-        /// engine if necessary.
-        /// </summary>
-        public void NotifyChanged()
-        {
-            using (changesync.AcquireWrite())
-            {
-                int start = FindUpdateStart();
-                _changedcells.Clear();
-                if (start != -1)
-                {
-                    _first_invalid_frame = Math.Min(start, _first_invalid_frame);
-                }
-                else
-                {
-                    // every single change has no effect on physics
-                    // our backup has no value
-                    _savedcells.Clear();
-                }
-            }
-        }
-        private int FindUpdateStart()
-        {
-            if (_changedcells.Count == 0)
-                return -1;
-            RectLRTB changebounds = new RectLRTB(_changedcells.First());
-            foreach (var cell in _changedcells)
-            {
-                changebounds.left = Math.Min(cell.X, changebounds.left);
-                changebounds.top = Math.Min(cell.Y, changebounds.top);
-                changebounds.right = Math.Max(cell.X, changebounds.right);
-                changebounds.bottom = Math.Max(cell.Y, changebounds.bottom);
-            }
-            return CalculateFirstInteraction(changebounds);
-        }
-        private int CalculateFirstInteraction(RectLRTB changebounds)
-        {
-            int framecount = _frames.Count;
-            for (int frame = 1; frame < framecount; frame++)
-            {
-                if (!changebounds.Intersects(_frames[frame].Rider.PhysicsBounds))
-                    continue;
-                foreach (var change in _changedcells)
-                {
-                    if (_frames[frame].Rider.PhysicsBounds.ContainsPoint(change))
-                    {
-                        if (CheckInteraction(frame))
-                            return frame;
-                        // we dont have to check this rider more than once!
-                        break;
-                    }
-                }
-            }
-            return -1;
-        }
-        private bool CheckInteraction(int frame)
-        {
-            // even though its this frame that may need changing, we have to 
-            // regenerate it using the previos frame.
-            var newsimulated = _frames[frame - 1].Rider.Simulate(
-                _track.Grid,
-                _track.Bones,
-                null,
-                6,
-                false);
-            if (!newsimulated.Body.CompareTo(_frames[frame].Rider.Body))
-            {
-                return true;
-            }
-
-            return false;
-        }
+      }
     }
+    /// <summary>
+    /// Checks for the earliest changed frame and notifies the recompute 
+    /// engine if necessary.
+    /// </summary>
+    public void NotifyChanged()
+    {
+      using (changesync.AcquireWrite())
+      {
+        int start = FindUpdateStart();
+        _changedcells.Clear();
+        if (start != -1)
+        {
+          _first_invalid_frame = Math.Min(start, _first_invalid_frame);
+        }
+        else
+        {
+          // every single change has no effect on physics
+          // our backup has no value
+          _savedcells.Clear();
+        }
+      }
+    }
+    private int FindUpdateStart()
+    {
+      if (_changedcells.Count == 0)
+        return -1;
+      RectLRTB changebounds = new RectLRTB(_changedcells.First());
+      foreach (var cell in _changedcells)
+      {
+        changebounds.left = Math.Min(cell.X, changebounds.left);
+        changebounds.top = Math.Min(cell.Y, changebounds.top);
+        changebounds.right = Math.Max(cell.X, changebounds.right);
+        changebounds.bottom = Math.Max(cell.Y, changebounds.bottom);
+      }
+      return CalculateFirstInteraction(changebounds);
+    }
+    private int CalculateFirstInteraction(RectLRTB changebounds)
+    {
+      int framecount = _frames.Count;
+      for (int frame = 1; frame < framecount; frame++)
+      {
+        if (!changebounds.Intersects(_frames[frame].Rider.PhysicsBounds))
+          continue;
+        foreach (var change in _changedcells)
+        {
+          if (_frames[frame].Rider.PhysicsBounds.ContainsPoint(change))
+          {
+            if (CheckInteraction(frame))
+              return frame;
+            // we dont have to check this rider more than once!
+            break;
+          }
+        }
+      }
+      return -1;
+    }
+    private bool CheckInteraction(int frame)
+    {
+      // even though its this frame that may need changing, we have to 
+      // regenerate it using the previos frame.
+      var newsimulated = _frames[frame - 1].Rider.Simulate(
+        _track.Grid,
+        _track.Bones,
+        null,
+        6,
+        false);
+      if (!newsimulated.Body.CompareTo(_frames[frame].Rider.Body))
+      {
+        return true;
+      }
+
+      return false;
+    }
+  }
 }

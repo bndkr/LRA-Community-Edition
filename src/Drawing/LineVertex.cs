@@ -1,5 +1,5 @@
 //  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -24,28 +24,28 @@ using OpenTK;
 using System.Drawing;
 namespace linerider.Drawing
 {
+  /// <summary>
+  /// A vertex meant for the simulation line shader
+  /// </summary>
+  [StructLayout(LayoutKind.Sequential, Pack = 1)]
+  public struct LineVertex
+  {
+    public static readonly int Size = Marshal.SizeOf(typeof(LineVertex));
+    public Vector2 Position;
+    public int color;
+    // shorts for alignment or something
+    // who knows
     /// <summary>
-    /// A vertex meant for the simulation line shader
+    /// 0 or 1
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct LineVertex
-    {
-        public static readonly int Size = Marshal.SizeOf(typeof(LineVertex));
-        public Vector2 Position;
-        public int color;
-        // shorts for alignment or something
-        // who knows
-        /// <summary>
-        /// 0 or 1
-        /// </summary>
-        public byte u;
-        /// <summary>
-        /// 0 or 1
-        /// </summary>
-        public byte v;
-        public byte selectionflags;
-        public byte reserved;
-        public float ratio;
-        public float scale;
-    }
+    public byte u;
+    /// <summary>
+    /// 0 or 1
+    /// </summary>
+    public byte v;
+    public byte selectionflags;
+    public byte reserved;
+    public float ratio;
+    public float scale;
+  }
 }

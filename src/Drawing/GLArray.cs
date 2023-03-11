@@ -1,5 +1,5 @@
 //  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -28,35 +28,35 @@ using linerider.Rendering;
 
 namespace linerider.Drawing
 {
-    public abstract class GLArray<T>
-    where T : struct
+  public abstract class GLArray<T>
+  where T : struct
+  {
+    public AutoArray<T> Array = new AutoArray<T>(500);
+    public GLArray()
     {
-        public AutoArray<T> Array = new AutoArray<T>(500);
-        public GLArray()
-        {
-        }
-        public void AddVertex(T vertex)
-        {
-            Array.Add(vertex);
-        }
-        public void Draw(PrimitiveType primitive)
-        {
-            BeginDraw();
-            InternalDraw(primitive);
-            EndDraw();
-        }
-        public void Clear()
-        {
-            Array.Clear();
-        }
-        protected virtual void BeginDraw()
-        {
-        }
-        protected virtual void InternalDraw(PrimitiveType primitive)
-        {
-        }
-        protected virtual void EndDraw()
-        {
-        }
     }
+    public void AddVertex(T vertex)
+    {
+      Array.Add(vertex);
+    }
+    public void Draw(PrimitiveType primitive)
+    {
+      BeginDraw();
+      InternalDraw(primitive);
+      EndDraw();
+    }
+    public void Clear()
+    {
+      Array.Clear();
+    }
+    protected virtual void BeginDraw()
+    {
+    }
+    protected virtual void InternalDraw(PrimitiveType primitive)
+    {
+    }
+    protected virtual void EndDraw()
+    {
+    }
+  }
 }

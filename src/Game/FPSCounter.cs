@@ -1,5 +1,5 @@
 ﻿//  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -23,40 +23,40 @@ using System.Text;
 
 namespace linerider
 {
-    public class FPSCounter
+  public class FPSCounter
+  {
+    private Queue<double> _queue = new Queue<double>();
+    public double FPS
     {
-        private Queue<double> _queue = new Queue<double>();
-        public double FPS
-        {
-            get
-            {
-                if (_queue.Count == 0)
-                    return 1;
-                var avg = _queue.Average();
-                return 1.0 / avg;
-            }
-        }
-        private double _framehistory = 20;
-        public void AddFrame(double f)
-        {
-            _queue.Enqueue(f);
-            if (_queue.Count > _framehistory)
-            {
-                _queue.Dequeue();
-            }
-        }
-        public void Reset()
-        {
-            var last = _queue.LastOrDefault();
-            _queue.Clear();
-            _queue.Enqueue(last);
-        }
-        public void Reset(int fps)
-        {
-            for (int i = 0; i < _framehistory; i++)
-            {
-                AddFrame(1.0 / fps);
-            }
-        }
+      get
+      {
+        if (_queue.Count == 0)
+          return 1;
+        var avg = _queue.Average();
+        return 1.0 / avg;
+      }
     }
+    private double _framehistory = 20;
+    public void AddFrame(double f)
+    {
+      _queue.Enqueue(f);
+      if (_queue.Count > _framehistory)
+      {
+        _queue.Dequeue();
+      }
+    }
+    public void Reset()
+    {
+      var last = _queue.LastOrDefault();
+      _queue.Clear();
+      _queue.Enqueue(last);
+    }
+    public void Reset(int fps)
+    {
+      for (int i = 0; i < _framehistory; i++)
+      {
+        AddFrame(1.0 / fps);
+      }
+    }
+  }
 }

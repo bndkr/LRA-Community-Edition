@@ -1,5 +1,5 @@
 ﻿//  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -22,42 +22,42 @@ using System;
 
 namespace linerider.Audio
 {
-    internal class AudioDevice : IDisposable
+  internal class AudioDevice : IDisposable
+  {
+    private IntPtr _hDevice;
+    private ContextHandle _hContext;
+    private bool disposed = false;
+    private static int devicecount = 0;
+
+    public AudioDevice()
     {
-        private IntPtr _hDevice;
-        private ContextHandle _hContext;
-        private bool disposed = false;
-        private static int devicecount = 0;
-
-        public AudioDevice()
+      try
+      {
+        _hDevice = Alc.OpenDevice(null);
+        if (_hDevice != IntPtr.Zero)
         {
-            try
-            {
-                _hDevice = Alc.OpenDevice(null);
-                if (_hDevice != IntPtr.Zero)
-                {
-                    _hContext = Alc.CreateContext(_hDevice, (int[])null);
-                    if (_hContext.Handle != IntPtr.Zero)
-                    {
-                        Alc.MakeContextCurrent(_hContext);
-                        devicecount++;
-                        Check();
-                    }
-                }
-            }
-            catch
-            {
-                devicecount--;
-            }
+          _hContext = Alc.CreateContext(_hDevice, (int[])null);
+          if (_hContext.Handle != IntPtr.Zero)
+          {
+            Alc.MakeContextCurrent(_hContext);
+            devicecount++;
+            Check();
+          }
         }
+      }
+      catch
+      {
+        devicecount--;
+      }
+    }
 
-        public void Dispose()
-        {
-            if (!disposed)
-            {
-                devicecount--;
-                disposed = true;
-                GC.SuppressFinalize(this);
+    public void Dispose()
+    {
+      if (!disposed)
+      {
+        devicecount--;
+        disposed = true;
+        GC.SuppressFinalize(this);
 				try
 				{
 					Alc.MakeContextCurrent(new ContextHandle(IntPtr.Zero));
@@ -67,29 +67,29 @@ namespace linerider.Audio
 #pragma warning restore RECS0022 // A catch clause that catches System.Exception and has an empty body
 				{ 
 				}
-                if (_hContext.Handle != IntPtr.Zero)
-                {
-                    Alc.DestroyContext(_hContext);
-                }
-                if (_hDevice != IntPtr.Zero)
-                {
-                    Alc.CloseDevice(_hDevice);
-                }
-            }
-        }
-
-        public static void Check()
+        if (_hContext.Handle != IntPtr.Zero)
         {
-            if (devicecount != 0)
-            {
-                var error = AL.GetError();
-                if (error != ALError.NoError)
-                    throw new OpenTK.Audio.AudioException("OpenAL error " + AL.GetErrorString(error));
-            }
-            else
-            {
-                throw new OpenTK.Audio.AudioDeviceException("Audio device was disposed");
-            }
+          Alc.DestroyContext(_hContext);
         }
+        if (_hDevice != IntPtr.Zero)
+        {
+          Alc.CloseDevice(_hDevice);
+        }
+      }
     }
+
+    public static void Check()
+    {
+      if (devicecount != 0)
+      {
+        var error = AL.GetError();
+        if (error != ALError.NoError)
+          throw new OpenTK.Audio.AudioException("OpenAL error " + AL.GetErrorString(error));
+      }
+      else
+      {
+        throw new OpenTK.Audio.AudioDeviceException("Audio device was disposed");
+      }
+    }
+  }
 }

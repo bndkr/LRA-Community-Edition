@@ -1,5 +1,5 @@
 ﻿//  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -20,46 +20,46 @@ using System;
 
 namespace linerider.Game
 {
-    public class LineTrigger
+  public class LineTrigger
+  {
+    public bool ZoomTrigger = false;
+    public float ZoomTarget = 4;
+    public int ZoomFrames = 40;
+    public int LineID = -1;
+    public LineTrigger()
     {
-        public bool ZoomTrigger = false;
-        public float ZoomTarget = 4;
-        public int ZoomFrames = 40;
-        public int LineID = -1;
-        public LineTrigger()
-        {
-        }
-        public bool CompareTo(LineTrigger other)
-        {
-            if (other == null)
-                return false;
-            return ZoomTrigger == other.ZoomTrigger &&
-            ZoomTarget == other.ZoomTarget &&
-            ZoomFrames == other.ZoomFrames;
-        }
-        public bool Activate(int hitdelta, ref float currentzoom)
-        {
-            bool handled = false;
-            if (ZoomTrigger)
-            {
-                if (currentzoom != ZoomTarget)
-                {
-                    if (hitdelta >= 0 && hitdelta < ZoomFrames)
-                    {
-                        var diff = ZoomTarget - currentzoom;
-                        currentzoom = currentzoom + (diff / (ZoomFrames - hitdelta));
-                        handled = true;
-                    }
-                    else
-                    {
-                        currentzoom = ZoomTarget;
-                    }
-                }
-            }
-            return handled;
-        }
-        public void Reset()
-        {
-        }
     }
+    public bool CompareTo(LineTrigger other)
+    {
+      if (other == null)
+        return false;
+      return ZoomTrigger == other.ZoomTrigger &&
+      ZoomTarget == other.ZoomTarget &&
+      ZoomFrames == other.ZoomFrames;
+    }
+    public bool Activate(int hitdelta, ref float currentzoom)
+    {
+      bool handled = false;
+      if (ZoomTrigger)
+      {
+        if (currentzoom != ZoomTarget)
+        {
+          if (hitdelta >= 0 && hitdelta < ZoomFrames)
+          {
+            var diff = ZoomTarget - currentzoom;
+            currentzoom = currentzoom + (diff / (ZoomFrames - hitdelta));
+            handled = true;
+          }
+          else
+          {
+            currentzoom = ZoomTarget;
+          }
+        }
+      }
+      return handled;
+    }
+    public void Reset()
+    {
+    }
+  }
 }

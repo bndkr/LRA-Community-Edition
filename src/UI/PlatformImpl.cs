@@ -1,6 +1,6 @@
 
 //  Author:
-//       Noah Ablaseau <nablaseau@hotmail.com>
+//     Noah Ablaseau <nablaseau@hotmail.com>
 //
 //  Copyright (c) 2017 
 //
@@ -24,100 +24,100 @@ using OpenTK;
 
 namespace linerider.UI
 {
-    public class PlatformImpl : Gwen.Platform.Neutral.PlatformImplementation
+  public class PlatformImpl : Gwen.Platform.Neutral.PlatformImplementation
+  {
+    public MouseCursor CurrentCursor = MouseCursor.Default;
+    private MainWindow game;
+    public PlatformImpl(MainWindow game)
     {
-        public MouseCursor CurrentCursor = MouseCursor.Default;
-        private MainWindow game;
-        public PlatformImpl(MainWindow game)
-        {
-            this.game = game;
-        }
-        public override bool SetClipboardText(string text)
-        {
-            bool ret = false;
-            Thread staThread = new Thread(
-                () =>
-                {
-                    try
-                    {
-                        Clipboard.SetText(text);
-                        ret = true;
-                    }
-                    catch (Exception)
-                    {
-                        return;
-                    }
-                });
-            staThread.SetApartmentState(ApartmentState.STA);
-            staThread.Start();
-            staThread.Join();
-            // at this point either you have clipboard data or an exception
-            return ret;
-        }
-        public override string GetClipboardText()
-        {
-            // code from http://forums.getpaint.net/index.php?/topic/13712-trouble-accessing-the-clipboard/page__view__findpost__p__226140
-            string ret = String.Empty;
-            Thread staThread = new Thread(
-                () =>
-                {
-                    try
-                    {
-                        if (!Clipboard.ContainsText())
-                            return;
-                        ret = Clipboard.GetText();
-                    }
-                    catch (Exception)
-                    {
-                        return;
-                    }
-                });
-            staThread.SetApartmentState(ApartmentState.STA);
-            staThread.Start();
-            staThread.Join();
-            // at this point either you have clipboard data or an exception
-            return ret;
-        }
-        private void SetGameCursor(OpenTK.MouseCursor cursor)
-        {
-            if (game.Cursor != cursor)
-            {
-                CurrentCursor = cursor;
-                game.UpdateCursor();
-            }
-        }
-        public override void SetCursor(Gwen.Cursor c)
-        {
-            switch (c.Name)
-            {
-                default:
-                case "Default":
-                    SetGameCursor(game.Cursors["default"]);
-                    return;
-                case "SizeWE":
-                    SetGameCursor(game.Cursors["size_hor"]);
-                    break;
-                case "SizeNWSE":
-                    SetGameCursor(game.Cursors["size_nwse"]);
-                    break;
-                case "SizeNS":
-                    SetGameCursor(game.Cursors["size_ver"]);
-                    break;
-                case "SizeNESW":
-                    SetGameCursor(game.Cursors["size_nesw"]);
-                    break;
-                case "IBeam":
-                    SetGameCursor(game.Cursors["ibeam"]);
-                    break;
-                case "Hand":
-                    SetGameCursor(game.Cursors["hand_point"]);
-                    break;
-                case "SizeAll":
-                case "Help":
-                case "No":
-                    SetGameCursor(game.Cursors["default"]);
-                    break;
-            }
-        }
+      this.game = game;
     }
+    public override bool SetClipboardText(string text)
+    {
+      bool ret = false;
+      Thread staThread = new Thread(
+        () =>
+        {
+          try
+          {
+            Clipboard.SetText(text);
+            ret = true;
+          }
+          catch (Exception)
+          {
+            return;
+          }
+        });
+      staThread.SetApartmentState(ApartmentState.STA);
+      staThread.Start();
+      staThread.Join();
+      // at this point either you have clipboard data or an exception
+      return ret;
+    }
+    public override string GetClipboardText()
+    {
+      // code from http://forums.getpaint.net/index.php?/topic/13712-trouble-accessing-the-clipboard/page__view__findpost__p__226140
+      string ret = String.Empty;
+      Thread staThread = new Thread(
+        () =>
+        {
+          try
+          {
+            if (!Clipboard.ContainsText())
+              return;
+            ret = Clipboard.GetText();
+          }
+          catch (Exception)
+          {
+            return;
+          }
+        });
+      staThread.SetApartmentState(ApartmentState.STA);
+      staThread.Start();
+      staThread.Join();
+      // at this point either you have clipboard data or an exception
+      return ret;
+    }
+    private void SetGameCursor(OpenTK.MouseCursor cursor)
+    {
+      if (game.Cursor != cursor)
+      {
+        CurrentCursor = cursor;
+        game.UpdateCursor();
+      }
+    }
+    public override void SetCursor(Gwen.Cursor c)
+    {
+      switch (c.Name)
+      {
+        default:
+        case "Default":
+          SetGameCursor(game.Cursors["default"]);
+          return;
+        case "SizeWE":
+          SetGameCursor(game.Cursors["size_hor"]);
+          break;
+        case "SizeNWSE":
+          SetGameCursor(game.Cursors["size_nwse"]);
+          break;
+        case "SizeNS":
+          SetGameCursor(game.Cursors["size_ver"]);
+          break;
+        case "SizeNESW":
+          SetGameCursor(game.Cursors["size_nesw"]);
+          break;
+        case "IBeam":
+          SetGameCursor(game.Cursors["ibeam"]);
+          break;
+        case "Hand":
+          SetGameCursor(game.Cursors["hand_point"]);
+          break;
+        case "SizeAll":
+        case "Help":
+        case "No":
+          SetGameCursor(game.Cursors["default"]);
+          break;
+      }
+    }
+  }
 }
