@@ -4,7 +4,7 @@ VisualStudioVersion = 17.4.33403.182
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "linerider", "linerider.csproj", "{AB45D1B5-B29D-4792-9CA8-C7C11E33A447}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{D04B6F1D-AB15-440B-BFB5-5699E5FA5F80}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gwen", "gwen", "{D04B6F1D-AB15-440B-BFB5-5699E5FA5F80}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gwen", "..\lib\gwen-lra\Gwen\Gwen.csproj", "{ADDA2F43-96C0-497F-8216-29C67ABC9806}"
 EndProject

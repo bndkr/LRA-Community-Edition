@@ -4,5 +4,6 @@
 **/.vs
 **/obj
 **/packages
+*/bin/*
 build
 deploy
