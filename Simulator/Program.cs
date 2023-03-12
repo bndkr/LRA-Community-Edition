@@ -42,7 +42,6 @@ namespace Simulator
       test.TestSimulator();
       test.TestLineCreation();
 
-
       // generate the starter track
       var track = new Track();
       track.Name = "yeeoo";

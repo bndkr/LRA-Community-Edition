@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MathNet.Numerics.Distributions;
 
 namespace Simulator
 {
@@ -13,30 +14,46 @@ namespace Simulator
     public static GameLine AddLineToTrack(Track track)
     {
       Random r = new Random();
+      Normal normalDist = new Normal();
+      normalDist.Sample();
       
       var lastLine = (StandardLine) track.GetLastAddedLine();
       var lastLineLength = lastLine.GetLength();
       var lastLineAngle = GetLineAngle(GetLineVec2(lastLine));
       var lastLineInverted = lastLine.inv;
-
       var lastLineP1 = new Vec2(lastLine.GetX1(), lastLine.GetY1());
       var lastLineP2 = new Vec2(lastLine.GetX2(), lastLine.GetY2());
 
       // chance for new, seperate line segment
-      if (r.NextDouble() < 0.1)
+      if (r.NextDouble() < 0.3)
       {
-        var newP1 = new Vec2((lastLineP1.x + lastLineP2.x) / 2,
-                                (lastLineP1.y + lastLineP2.y) / 2);
-        newP1.x += r.NextDouble() * 200 - 100;
-        newP1.y += r.NextDouble() * 200 - 100;
-
-        var newAngle = r.NextDouble() * Math.PI - (Math.PI / 2);
-        var newLength = r.NextDouble() * 50;
-        var newLine = new StandardLine(newP1.x,
-                                       newP1.y,
-                                       newP1.x + newLength * Math.Cos(newAngle),
-                                       newP1.y + newLength * Math.Sin(newAngle));
-        return newLine;
+        
+        if (r.NextDouble() < 0.5)
+        {
+          // try to extend to the right
+          var p1 = new Vec2(
+            lastLineP2.x + lastLineLength * Math.Cos(lastLineAngle) + r.NextDouble() * 40 - 20,
+            lastLineP2.y + lastLineLength * Math.Sin(lastLineAngle) + r.NextDouble() * 40 - 20);
+          var length = lastLineLength + r.NextDouble() * 40 - 20;
+          var angle = lastLineAngle + r.NextDouble() - 0.5;
+          var p2 = new Vec2(
+             p1.x + length * Math.Cos(angle),
+             p1.y + length * Math.Sin(angle));
+          return new StandardLine(p1.x, p1.y, p2.x, p2.y, lastLineInverted);
+        }
+        else
+        {
+          // try to extend to the left
+          var p2 = new Vec2(
+            lastLineP1.x - lastLineLength * Math.Cos(lastLineAngle) + r.NextDouble() * 40 - 20,
+            lastLineP1.y - lastLineLength * Math.Sin(lastLineAngle) + r.NextDouble() * 40 - 20);
+          var length = lastLineLength + r.NextDouble() * 40 - 20;
+          var angle = lastLineAngle + r.NextDouble() - 0.5;
+          var p1 = new Vec2(
+             p2.x - length * Math.Cos(angle),
+             p2.y - length * Math.Sin(angle));
+          return new StandardLine(p1.x, p1.y, p2.x, p2.y, lastLineInverted);
+        }
       }
       else // generate a line that connects to the last one
       {
@@ -61,7 +78,6 @@ namespace Simulator
                              lastLineLength,
                              lastLineInverted);
           return line;
-          
         }
         else if (secondLineP1 == lastLineP2)
         {
@@ -96,7 +112,6 @@ namespace Simulator
         }
       }
     }
-
     private static GameLine AddLine(Vec2 point,
                                 double angle,
                                 double length,

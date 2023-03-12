@@ -63,7 +63,6 @@ namespace Test
 
     }
 
-
     private StandardLine CreateRandomLine()
     {
       Random r = new Random();
