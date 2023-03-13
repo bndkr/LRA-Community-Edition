@@ -27,7 +27,11 @@ namespace Simulator
 
       int i = 1;
       int idleCount = 0;
-      while (idleCount < 5 && !IsGoingTooFast(currVelocity) && i < track.LineLookup.Count * 140)
+      int airborneCount = 0;
+      while (idleCount < 5 &&
+             airborneCount < 75 &&
+             i < track.LineLookup.Count * 140 &&
+             !result.crashed)
       {
         TimestampReport r = new TimestampReport();
 
@@ -43,8 +47,13 @@ namespace Simulator
         r.acceleration = acceleration;
         r.accelerationMag = acceleration.Mag();
         r.timeStamp = i;
-        r.freeFall = (Math.Abs(acceleration.y - 0.175) < 0.0001 &&
-          System.Math.Abs(acceleration.x) < 0.0001);
+        r.freeFall = IsInFreeFall(acceleration);
+
+        if (IsIdle(currVelocity))
+        {
+          r.idle = true;
+          result.stopped = true;
+        }
 
         result.collidedWithNewLine |= timeline.HasCollidedWithLine(i, addedLine.ID);
         result.crashed |= (rider.Crashed || rider.SledBroken);
@@ -54,11 +63,11 @@ namespace Simulator
         //   Console.WriteLine("unique collision");
         // }
 
-        // idle tracking
-        if (IsIdle(currVelocity))
-          idleCount++;
+        // freefall tracking
+        if (IsInFreeFall(acceleration))
+          airborneCount++;
         else
-          idleCount = 0;
+          airborneCount = 0;
 
 
         result.timestamps.Add(r);
@@ -70,6 +79,13 @@ namespace Simulator
       }
       return result;
     }
+
+    private static bool IsInFreeFall(Vec2 acceleration)
+    {
+      return Math.Abs(acceleration.y - 0.175) < 0.0001 &&
+             System.Math.Abs(acceleration.x) < 0.0001;
+    }
+
     public static Vec2 CalculateVelocity(Vec2 initial, Vec2 curr)
     {
       return new Vec2(curr.x - initial.x, curr.y - initial.y);

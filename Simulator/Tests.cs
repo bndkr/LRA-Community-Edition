@@ -3,6 +3,7 @@ using linerider.Game;
 using System.Diagnostics;
 using Simulator;
 using System.ComponentModel.Design;
+using linerider.IO;
 
 namespace Test
 {
@@ -51,19 +52,18 @@ namespace Test
     {
       var track = new Track();
 
-      var line = new StandardLine(0.0, 20, 200.0, 200.0);
+      var line = new StandardLine(200, 200, 0, 0, true);
       track.AddLine(line);
 
-
-      for (int i = 0; i < 100; i++)
+      for (int i = 0; i < 20; i++)
       {
         var newline = LineGenerator.AddLineToTrack(track);
-        // System.Console.WriteLine($"x1: {newline.GetX1()}, y1: {newline.GetY1()}, x2:{newline.GetX2()}, y2:{newline.GetY2()}");
+        track.AddLine(newline);
+        TRKWriter.SaveTrack(track, $"iteration_{i}");
       }
-
     }
 
-    private StandardLine CreateRandomLine()
+    private static StandardLine CreateRandomLine()
     {
       Random r = new Random();
       return new StandardLine(

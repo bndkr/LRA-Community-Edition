@@ -37,16 +37,15 @@ namespace Simulator
       multiplier *= WeightTransferFunction(
         1, 1, CountAccelerationSpikes(report.timestamps));
 
-      // var velocityMagList = GetVelocityMagList(report.timestamps);
-      // multiplier *= WeightTransferFunction(4, 6, velocityMagList.Average());
+      var velocityMagList = GetVelocityMagList(report.timestamps);
+      multiplier *= WeightTransferFunction(4, 6, velocityMagList.Average());
       
-      // var velocityStandardDeviation = GetStandardDeviation(velocityMagList);
+      var velocityStandardDeviation = GetStandardDeviation(velocityMagList);
 
-      // multiplier *= WeightTransferFunction(3, 4, velocityStandardDeviation);
+      multiplier *= WeightTransferFunction(3, 4, velocityStandardDeviation);
 
       multiplier *= WeightTransferFunction(
-        3, 4, GetTouchTransitionScore(report.timestamps));
-
+        3, 7, GetTouchTransitionScore(report.timestamps));
 
       var deducted = multiplier * maxInt;
       return (int) (maxInt - deducted);
@@ -65,7 +64,7 @@ namespace Simulator
       foreach (var time in reports)
       {
         var magnitude = time.acceleration.Mag();
-        if (magnitude > 1.5) numSpikes++;
+        if (magnitude > 1.8) numSpikes++;
       }
       return (numSpikes * 100) / (double)reports.Count;
     }

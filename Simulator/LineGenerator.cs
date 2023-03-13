@@ -11,47 +11,57 @@ namespace Simulator
 {
   public static class LineGenerator
   {
-    public static GameLine AddLineToTrack(Track track)
+    public static GameLine AddLineToTrack(Track track, Report? winnerLastReport = null)
     {
       Random r = new Random();
-      Normal normalDist = new Normal();
-      normalDist.Sample();
-      
+
+      var winnerLastReportVel = 1.0;
+      if (winnerLastReport != null)
+      {
+        winnerLastReportVel = winnerLastReport.timestamps[winnerLastReport.timestamps.Count - 1].velocity.x;
+      }
+
       var lastLine = (StandardLine) track.GetLastAddedLine();
-      var lastLineLength = lastLine.GetLength();
-      var lastLineAngle = GetLineAngle(GetLineVec2(lastLine));
+      var scale = lastLine.GetLength() / 2;
+
+      var lastPoint1 = new Vec2(lastLine.GetX1(), lastLine.GetY1());
+      var lastPoint2 = new Vec2(lastLine.GetX2(), lastLine.GetY2());
+
+      Vec2 lastPointLeft = (lastPoint1.x < lastPoint2.x ? lastPoint1 : lastPoint2);
+      Vec2 lastPointRight = (lastPoint1.x >= lastPoint2.x ? lastPoint1 : lastPoint2);
       var lastLineInverted = lastLine.inv;
-      var lastLineP1 = new Vec2(lastLine.GetX1(), lastLine.GetY1());
-      var lastLineP2 = new Vec2(lastLine.GetX2(), lastLine.GetY2());
 
       // chance for new, seperate line segment
       if (r.NextDouble() < 0.3)
       {
-        
-        if (r.NextDouble() < 0.5)
+        if (winnerLastReportVel > 0)
         {
           // try to extend to the right
+          var xOffset = lastPointRight.x - lastPointLeft.x;
+          var yOffset = lastPointRight.y - lastPointLeft.y;
+
+          var dxOffset = xOffset + GetScaledRandom(r, scale);
+          var dyOffset = yOffset + GetScaledRandom(r, scale);
+
           var p1 = new Vec2(
-            lastLineP2.x + lastLineLength * Math.Cos(lastLineAngle) + r.NextDouble() * 40 - 20,
-            lastLineP2.y + lastLineLength * Math.Sin(lastLineAngle) + r.NextDouble() * 40 - 20);
-          var length = lastLineLength + r.NextDouble() * 40 - 20;
-          var angle = lastLineAngle + r.NextDouble() - 0.5;
-          var p2 = new Vec2(
-             p1.x + length * Math.Cos(angle),
-             p1.y + length * Math.Sin(angle));
+            lastPointRight.x + xOffset + GetScaledRandom(r, scale),
+            lastPointRight.y + yOffset + GetScaledRandom(r, scale));
+          var p2 = new Vec2(p1.x + dxOffset, p1.y + dyOffset);
           return new StandardLine(p1.x, p1.y, p2.x, p2.y, lastLineInverted);
         }
         else
         {
           // try to extend to the left
-          var p2 = new Vec2(
-            lastLineP1.x - lastLineLength * Math.Cos(lastLineAngle) + r.NextDouble() * 40 - 20,
-            lastLineP1.y - lastLineLength * Math.Sin(lastLineAngle) + r.NextDouble() * 40 - 20);
-          var length = lastLineLength + r.NextDouble() * 40 - 20;
-          var angle = lastLineAngle + r.NextDouble() - 0.5;
+          var xOffset = lastPointLeft.x - lastPointRight.x;
+          var yOffset = lastPointLeft.y - lastPointRight.y;
+
+          var dxOffset = xOffset + GetScaledRandom(r, scale);
+          var dyOffset = yOffset + GetScaledRandom(r, scale);
+
           var p1 = new Vec2(
-             p2.x - length * Math.Cos(angle),
-             p2.y - length * Math.Sin(angle));
+            lastPointRight.x - xOffset + GetScaledRandom(r, scale),
+            lastPointRight.y - yOffset + GetScaledRandom(r, scale));
+          var p2 = new Vec2(p1.x + dxOffset, p1.y + dyOffset);
           return new StandardLine(p1.x, p1.y, p2.x, p2.y, lastLineInverted);
         }
       }
@@ -61,86 +71,82 @@ namespace Simulator
         var secondLine = (StandardLine)track.GetSecondToLastAddedLine();
         if (secondLine == null)
         {
-          var line = AddLine(lastLineP2,
-                             lastLineAngle,
-                             lastLineLength,
-                             lastLineInverted);
-          return line;
+          // add the new line to lastPointRight
+
+          var xOffset = lastPointRight.x - lastPointLeft.x + GetScaledRandom(r, scale);
+          var yOffset = lastPointRight.y - lastPointLeft.y + GetScaledRandom(r, scale);
+
+          return new StandardLine(lastPointRight.x,
+                                  lastPointRight.y,
+                                  lastPointRight.x + xOffset,
+                                  lastPointRight.y + yOffset,
+                                  lastLineInverted);
         }
         var secondLineP1 = new Vec2(secondLine.GetX1(), secondLine.GetY1());
         var secondLineP2 = new Vec2(secondLine.GetX2(), secondLine.GetY2());
 
-        if (secondLineP2 == lastLineP1)
+        var secondLineLeft = (secondLineP1.x < secondLineP2.x ? secondLineP1 : secondLineP2);
+        var secondLineRight = (secondLineP1.x >= secondLineP2.x ? secondLineP1 : secondLineP2);
+
+        if (secondLineRight == lastPointLeft)
         {
-          // add the new line to lastLineP2
-          var line = AddLine(lastLineP2,
-                             lastLineAngle,
-                             lastLineLength,
-                             lastLineInverted);
-          return line;
+          // add the new line to lastPointRight
+
+          var xOffset = lastPointRight.x - lastPointLeft.x + GetScaledRandom(r, scale);
+          var yOffset = lastPointRight.y - lastPointLeft.y + GetScaledRandom(r, scale);
+
+          return new StandardLine(lastPointRight.x,
+                                  lastPointRight.y,
+                                  lastPointRight.x + xOffset,
+                                  lastPointRight.y + yOffset, 
+                                  lastLineInverted);
         }
-        else if (secondLineP1 == lastLineP2)
+        else if (secondLineLeft == lastPointRight)
         {
-          // add the new line to lastLineP1
-          var line = AddLine(lastLineP1,
-                  lastLineAngle,
-                  lastLineLength,
-                  lastLineInverted);
-          return line;
+          // add the new line to lastPointLeft
+          var xOffset = lastPointLeft.x - lastPointRight.x + GetScaledRandom(r, scale);
+          var yOffset = lastPointLeft.y - lastPointRight.y + GetScaledRandom(r, scale);
+
+          return new StandardLine(lastPointRight.x,
+                                  lastPointRight.y,
+                                  lastPointRight.x + xOffset,
+                                  lastPointRight.y + yOffset,
+                                  lastLineInverted);
         }
         else
         {
           // the second line is floating, add to either side
-          if (r.NextDouble() < 0.5)
+          if (winnerLastReportVel > 0)
           {
-            // add the new line to lastLineP1 
-            var line = AddLine(lastLineP1,
-                    lastLineAngle,
-                    lastLineLength,
-                    lastLineInverted);
-            return line;
+            // add the new line to lastPointRight
+            var xOffset = lastPointRight.x - lastPointLeft.x + GetScaledRandom(r, scale);
+            var yOffset = lastPointRight.y - lastPointLeft.y + GetScaledRandom(r, scale);
+
+            return new StandardLine(lastPointRight.x,
+                                    lastPointRight.y,
+                                    lastPointRight.x + xOffset,
+                                    lastPointRight.y + yOffset,
+                                    lastLineInverted);
           }
           else
           {
-            // add the new line to lastLineP2
-            var line = AddLine(lastLineP2,
-                    lastLineAngle,
-                    lastLineLength,
-                    lastLineInverted);
-            return line;
+            // add the new line to lastPointLeft
+            var xOffset = lastPointLeft.x - lastPointRight.x + GetScaledRandom(r, scale);
+            var yOffset = lastPointLeft.y - lastPointRight.y + GetScaledRandom(r, scale);
+
+            return new StandardLine(lastPointRight.x,
+                                    lastPointRight.y,
+                                    lastPointRight.x + xOffset,
+                                    lastPointRight.y + yOffset,
+                                    lastLineInverted);
           }
         }
       }
     }
-    private static GameLine AddLine(Vec2 point,
-                                double angle,
-                                double length,
-                                bool inverted)
-    {
-      Random r = new Random();
-      double dAngle = r.NextDouble() - 0.5;
-      double dLength = r.NextDouble() * 30 - 15;
 
-      if (!inverted)
-      {
-        var newLine = new StandardLine(
-          point.x,
-          point.y,
-          point.x + (length + dLength) * Math.Cos(angle + dAngle),
-          point.y + (length + dLength) * Math.Sin(angle + dAngle),
-          inverted);
-        return newLine;
-      }
-      else
-      {
-        var newLine = new StandardLine(
-          point.x + (length + dLength) * Math.Cos(angle + dAngle),
-          point.y + (length + dLength) * Math.Sin(angle + dAngle),
-          point.x,
-          point.y,
-          inverted);
-        return newLine;
-      }
+    private static double GetScaledRandom(Random r, double length)
+    {
+      return r.NextDouble() * length - (length / 2);
     }
 
     private static Vec2 GetLineVec2(GameLine line)

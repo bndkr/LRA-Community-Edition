@@ -5,6 +5,7 @@ using linerider.Utils;
 using System.Numerics;
 using System;
 using System.Text.Encodings.Web;
+using System.Diagnostics;
 
 namespace Simulator
 {
@@ -29,6 +30,11 @@ namespace Simulator
     {
       return (a.x != b.x || a.y != b.y);
     }
+
+    public override string ToString()
+    {
+      return $"x: {x}, y: {y}";
+    }
   }
   public class Program
   {
@@ -37,16 +43,23 @@ namespace Simulator
 
     static void Main(string[] args)
     {
-      var test = new Test.TestClass();
-      test.TestTrackClone();
-      test.TestSimulator();
-      test.TestLineCreation();
+      {
+        var test = new Test.TestClass();
+        test.TestTrackClone();
+        test.TestSimulator();
+        test.TestLineCreation();
+      }
+
 
       // generate the starter track
       var track = new Track();
       track.Name = "yeeoo";
       var startLine = new StandardLine(0, 20, 100, 100);
       track.AddLine(startLine);
+
+      var lineage = new List<Track>();
+      var reports = new List<Report>();
+      Report? winnerLastReport = null;
 
       for (int i = 0; i < NUM_LINES; i++)
       {
@@ -55,26 +68,30 @@ namespace Simulator
         for (int j = 0; j < NUM_TRIES; j++)
         {
           var currTrack = new Track(track);  // clone track
-          var newLine = LineGenerator.AddLineToTrack(currTrack);
-          // System.Console.WriteLine($"added line {newLine}");
+          var newLine = LineGenerator.AddLineToTrack(currTrack, winnerLastReport);
           currTrack.AddLine(newLine);
 
-          var report = TrackSimulator.Simulate(currTrack, newLine);
-          // report.PrintReport($"report_{i}_{j}.csv");
+          reports.Add(TrackSimulator.Simulate(currTrack, newLine));
 
           System.Console.Write($"finished sim {j}");
-          var score = Evaluator.calculateCost(report);
+          var score = Evaluator.calculateCost(reports[j]);
           scores.Add(score);
           System.Console.WriteLine("");
 
           possibleTracks.Add(currTrack);
-          // TRKWriter.SaveTrack(possibleTracks[j], $"track_{i}_{j}");
         }
         var winner = FindLowestCost(scores.ToArray());
         System.Console.WriteLine($"Winner: run {winner}");
         track = possibleTracks[winner];
+        lineage.Add(new Track(track));
+        winnerLastReport = reports[winner];
+        reports.Clear();
       }
       TRKWriter.SaveTrack(track, "coolest");
+      for (int i = 0; i < lineage.Count; i++)
+      {
+        TRKWriter.SaveTrack(lineage[i], $"lin_{i}");
+      }
     }
     private static int FindLowestCost(int[] scores)
     {
