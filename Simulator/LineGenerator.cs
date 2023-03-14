@@ -136,8 +136,8 @@ namespace Simulator
 
             return new StandardLine(lastPointRight.x,
                                     lastPointRight.y,
-                                    lastPointRight.x + xOffset,
-                                    lastPointRight.y + yOffset,
+                                    lastPointRight.x - xOffset,
+                                    lastPointRight.y - yOffset,
                                     lastLineInverted);
           }
         }

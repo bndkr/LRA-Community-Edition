@@ -50,7 +50,6 @@ namespace Simulator
         test.TestLineCreation();
       }
 
-
       // generate the starter track
       var track = new Track();
       track.Name = "yeeoo";
@@ -58,34 +57,37 @@ namespace Simulator
       track.AddLine(startLine);
 
       var lineage = new List<Track>();
-      var reports = new List<Report>();
       Report? winnerLastReport = null;
 
       for (int i = 0; i < NUM_LINES; i++)
       {
-        var possibleTracks = new List<Track>();
-        var scores = new List<int>();
+        var possibleTracks = new Track[NUM_TRIES];
+        var scores = new int[NUM_TRIES];
+        var reports = new Report[NUM_TRIES];
+        var taskResults = new Task<TryTrackResult>[NUM_TRIES];
+
+        // launch simulations
         for (int j = 0; j < NUM_TRIES; j++)
         {
-          var currTrack = new Track(track);  // clone track
-          var newLine = LineGenerator.AddLineToTrack(currTrack, winnerLastReport);
-          currTrack.AddLine(newLine);
-
-          reports.Add(TrackSimulator.Simulate(currTrack, newLine));
-
-          System.Console.Write($"finished sim {j}");
-          var score = Evaluator.calculateCost(reports[j]);
-          scores.Add(score);
-          System.Console.WriteLine("");
-
-          possibleTracks.Add(currTrack);
+          var p = new TryTrackParams(track, j, winnerLastReport);
+          taskResults[j] = TryTrackAsync(p);
         }
-        var winner = FindLowestCost(scores.ToArray());
+
+        for (int j = 0; j < NUM_TRIES; j++)
+        {
+          taskResults[j].Wait();
+          // unpack results
+          var result = taskResults[j].Result;
+          possibleTracks[j] = result.resultTrack;
+          scores[j] = result.score;
+          reports[j] = result.report;
+        }
+
+        var winner = FindLowestCost(scores);
         System.Console.WriteLine($"Winner: run {winner}");
         track = possibleTracks[winner];
         lineage.Add(new Track(track));
         winnerLastReport = reports[winner];
-        reports.Clear();
       }
       TRKWriter.SaveTrack(track, "coolest");
       for (int i = 0; i < lineage.Count; i++)
@@ -103,5 +105,48 @@ namespace Simulator
       }
       return result;
     }
+
+    private static async Task<TryTrackResult> TryTrackAsync(TryTrackParams p)
+    {
+      return await Task.Run(() => TryTrack(p));
+    }
+
+    private static TryTrackResult TryTrack(TryTrackParams p)
+    {
+      var result = new TryTrackResult();
+      var currTrack = new Track(p.lastWinner);  // clone track
+      var newLine = LineGenerator.AddLineToTrack(currTrack, p.winnerLastReport);
+      currTrack.AddLine(newLine);
+      
+      result.report = TrackSimulator.Simulate(currTrack, newLine);
+
+      var score = Evaluator.calculateCost(result.report);
+      result.score = score;
+      result.resultTrack = currTrack;
+      System.Console.WriteLine($"finished run {p.index}: {result.score}");
+      return result;
+    }
   }
+
+
+  class TryTrackParams
+  {
+    public TryTrackParams(Track lastWinner, int index, Report? winnerLastReport)
+    {
+      this.lastWinner = lastWinner;
+      this.index = index;
+      this.winnerLastReport = winnerLastReport;
+    }
+    public Track lastWinner;
+    public int index;
+    public Report? winnerLastReport;
+  }
+
+  class TryTrackResult
+  {
+    public int score;
+    public Track resultTrack;
+    public Report report;
+  }
+
 }

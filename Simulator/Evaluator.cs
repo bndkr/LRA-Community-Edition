@@ -16,20 +16,17 @@ namespace Simulator
 
       if (report.crashed)
       {
-        System.Console.Write(" crashed!");
         return maxInt;
       }
 
       if (!report.collidedWithNewLine)
       {
-        System.Console.Write(" didn't collide with new line");
         return maxInt;
       }
 
 
       if (report.stopped)
       {
-        System.Console.Write(" idle");
         return maxInt - 1;
       }
 
