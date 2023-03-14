@@ -146,7 +146,7 @@ namespace Simulator
 
     private static double GetScaledRandom(Random r, double length)
     {
-      return r.NextDouble() * length - (length / 2);
+      return r.NextDouble() * length - (length / 2.5);
     }
 
     private static Vec2 GetLineVec2(GameLine line)

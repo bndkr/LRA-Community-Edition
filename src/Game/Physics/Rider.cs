@@ -148,6 +148,16 @@ namespace linerider.Game
       return mo;
     }
 
+    public double CalculateMomentumX()
+    {
+      return CalculateMomentum().X;
+    }
+
+    public double CalculateMomentumY()
+    {
+      return CalculateMomentum().Y;
+    }
+
     public static Rider Lerp(Rider r1, Rider r2, float percent)
     {
       SimulationPoint[] joints = new SimulationPoint[r1.Body.Length];

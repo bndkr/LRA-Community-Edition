@@ -276,6 +276,7 @@ namespace linerider
     }
     public Rider GetStart()
     {
+      // TODO: update this to side-load a custom initial velocity
       return Rider.Create(this.StartOffset, new Vector2d(ZeroStart ? 0 : RiderConstants.StartingMomentum, 0), Remount, frictionless);
     }
     public void SetVersion(int version)

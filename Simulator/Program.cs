@@ -38,26 +38,26 @@ namespace Simulator
   }
   public class Program
   {
-    const int NUM_TRIES = 200;
-    const int NUM_LINES = 20;
+    const int NUM_TRIES = 100;
+    const int NUM_LINES = 50;
 
     static void Main(string[] args)
     {
-      {
-        var test = new Test.TestClass();
-        test.TestTrackClone();
-        test.TestSimulator();
-        test.TestLineCreation();
-      }
+      var test = new Test.TestClass();
+      test.TestTrackClone();
+      test.TestSimulator();
+      test.TestLineCreation();
 
       // generate the starter track
       var track = new Track();
       track.Name = "yeeoo";
-      var startLine = new StandardLine(0, 20, 100, 100);
+      var startLine = new StandardLine(0, 20, 50, 100);
       track.AddLine(startLine);
 
       var lineage = new List<Track>();
       Report? winnerLastReport = null;
+
+      Evaluator.ResetAllStats();
 
       for (int i = 0; i < NUM_LINES; i++)
       {
@@ -65,6 +65,7 @@ namespace Simulator
         var scores = new int[NUM_TRIES];
         var reports = new Report[NUM_TRIES];
         var taskResults = new Task<TryTrackResult>[NUM_TRIES];
+        var numFails = 0;
 
         // launch simulations
         for (int j = 0; j < NUM_TRIES; j++)
@@ -81,19 +82,23 @@ namespace Simulator
           possibleTracks[j] = result.resultTrack;
           scores[j] = result.score;
           reports[j] = result.report;
+          if (result.score == int.MaxValue) numFails++;
         }
 
         var winner = FindLowestCost(scores);
-        System.Console.WriteLine($"Winner: run {winner}");
+        System.Console.WriteLine($"Line ({i+1}/{NUM_LINES}): Completed {NUM_TRIES} simulations, {numFails} failed. Sim #{winner} won.");
         track = possibleTracks[winner];
         lineage.Add(new Track(track));
         winnerLastReport = reports[winner];
       }
       TRKWriter.SaveTrack(track, "coolest");
-      for (int i = 0; i < lineage.Count; i++)
-      {
-        TRKWriter.SaveTrack(lineage[i], $"lin_{i}");
-      }
+      // for (int i = 0; i < lineage.Count; i++)
+      // {
+      //   TRKWriter.SaveTrack(lineage[i], $"lin_{i}");
+      // }
+
+      // print stats
+      Evaluator.PrintStatistics();
     }
     private static int FindLowestCost(int[] scores)
     {
@@ -123,11 +128,9 @@ namespace Simulator
       var score = Evaluator.calculateCost(result.report);
       result.score = score;
       result.resultTrack = currTrack;
-      System.Console.WriteLine($"finished run {p.index}: {result.score}");
       return result;
     }
   }
-
 
   class TryTrackParams
   {
@@ -145,8 +148,8 @@ namespace Simulator
   class TryTrackResult
   {
     public int score;
-    public Track resultTrack;
-    public Report report;
+    public Track? resultTrack;
+    public Report? report;
   }
 
 }

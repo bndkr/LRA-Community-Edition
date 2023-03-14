@@ -37,7 +37,13 @@ namespace Simulator
 
         var rider = timeline.GetFrame(i);
         Vec2 currPosition = GetCenter(rider);
-        currVelocity = CalculateVelocity(initialPosition, currPosition);
+
+        currVelocity.x = rider.CalculateMomentumX();
+        currVelocity.y = rider.CalculateMomentumY();
+
+        // there is a descrepancy in these velocities, this may be source of error in future
+        var calculatedVelocity = CalculateVelocity(initialPosition, currPosition);
+
         acceleration = CalculateVelocity(initialVelocity, currVelocity);
         initialPosition = currPosition;
         initialVelocity = currVelocity;
