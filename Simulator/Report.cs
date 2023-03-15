@@ -31,18 +31,22 @@ namespace Simulator
       if (timestamps.Count == 0) return false;
 
       var str = new StringBuilder();
-      str.AppendLine("Timestamp,X,Y,Velocity,Acceleration,Free Fall");
+      str.AppendLine("timestamp,xpos,ypos,xvel,yvel,speed,xacc,yacc,accmag,freefall");
 
       foreach (var report in timestamps)
       {
         str.AppendLine(
-          String.Format("{0},{1},{2},{3},{4},{5}",
+          String.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}",
           report.timeStamp,
           report.position.x,
           -report.position.y,
+          report.velocity.x,
+          report.velocity.y,
           report.velocityMag,
+          report.acceleration.x,
+          report.acceleration.y,
           report.accelerationMag,
-          report.freeFall));
+          (report.freeFall ? 1 : 0)));
       }
       File.WriteAllText(path, str.ToString());
       return true;

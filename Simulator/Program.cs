@@ -39,7 +39,7 @@ namespace Simulator
   public class Program
   {
     const int NUM_TRIES = 100;
-    const int NUM_LINES = 250;
+    const int NUM_LINES = 100;
 
     static void Main(string[] args)
     {
@@ -106,7 +106,7 @@ namespace Simulator
       // reset the track's initial position
       track.InitialState = initialState;
       TRKWriter.SaveTrack(track, "coolest");
-
+      WriteFinalReport(track);
       Evaluator.PrintStatistics();
     }
     private static int FindLowestCost(int[] scores)
@@ -118,6 +118,15 @@ namespace Simulator
           result = i;
       }
       return result;
+    }
+
+    private static void WriteFinalReport(Track track)
+    {
+      Console.Write("Writing output report...");
+      var lastLine = track.GetLastAddedLine();
+      var totalReport = TrackSimulator.Simulate(track, lastLine);
+      totalReport.PrintReport("report.csv");
+      Console.WriteLine("done");
     }
 
     private static async Task<TryTrackResult> TryTrackAsync(TryTrackParams p)

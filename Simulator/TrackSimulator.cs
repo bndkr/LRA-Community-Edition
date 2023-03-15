@@ -17,8 +17,6 @@ namespace Simulator
       var result = new Report();
 
       Timeline timeline = new Timeline(track);
-      var initialRider = timeline.GetFrame(0);
-      Vec2 initialPosition = GetCenter(initialRider);
       Vec2 initialVelocity = new Vec2(0.1, 0.1);
       Vec2 currVelocity = new Vec2(0, 0);
       Vec2 acceleration= new Vec2(0, 0);
@@ -42,11 +40,7 @@ namespace Simulator
         currVelocity.x = rider.CalculateMomentumX();
         currVelocity.y = rider.CalculateMomentumY();
 
-        // there is a descrepancy in these velocities, this may be source of error in future
-        var calculatedVelocity = CalculateVelocity(initialPosition, currPosition);
-
-        acceleration = CalculateVelocity(initialVelocity, currVelocity);
-        initialPosition = currPosition;
+        acceleration = CalculateAcceleration(initialVelocity, currVelocity);
         initialVelocity = currVelocity;
         r.position = currPosition;
         r.velocity = currVelocity;
@@ -74,7 +68,7 @@ namespace Simulator
 
         if (i > 500 && !r.freeFall && !result.crashed)
         {
-          result.finalPosition = lastLocation; // off-by-one error
+          result.finalPosition = lastLocation; //  prevent off-by-one error
           break;
         }
 
@@ -96,7 +90,7 @@ namespace Simulator
              Math.Abs(acceleration.x) < 0.0001;
     }
 
-    public static Vec2 CalculateVelocity(Vec2 initial, Vec2 curr)
+    public static Vec2 CalculateAcceleration(Vec2 initial, Vec2 curr)
     {
       return new Vec2(curr.x - initial.x, curr.y - initial.y);
     }

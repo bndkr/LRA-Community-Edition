@@ -38,35 +38,39 @@ namespace Simulator
       // calculate number of acc. spikes per 100 samples
       var accelSpikeScore = WeightTransferFunction(1, 1, CountAccelerationSpikes(report.timestamps));
       multiplier *= accelSpikeScore;
+      accelSpikeScores.Add(accelSpikeScore);
+
 
       // we want a certain average speed
       var velocityMagList = GetVelocityMagList(report.timestamps);
       var averageSpeedScore = WeightTransferFunction(4, 9, velocityMagList.Average());
       multiplier *= averageSpeedScore;
+      averageSpeedScores.Add(averageSpeedScore);
+
 
       // we want a certain spread of speeds
       var velocityStandardDeviation = GetStandardDeviation(velocityMagList);
       var speedSDScore = WeightTransferFunction(2, 2, velocityStandardDeviation);
       multiplier *= speedSDScore;
+      speedSDScores.Add(speedSDScore);
 
       // we want the rider going all directions
       var directionScore = WeightTransferFunction(5, 2, GetDirectionScore(report.timestamps));
       multiplier *= directionScore;
+      directionScores.Add(directionScore);
+
 
       // we want the rider going airborne often
       var airborneScore = WeightTransferFunction(3, 7, GetTouchTransitionScore(report.timestamps));
       multiplier *= airborneScore;
+      airborneScores.Add(airborneScore);
+
 
       // we want great variation in height (y postion)
       var heightScore = WeightTransferFunction(400, 750, GetHeightSD(report.timestamps));
       multiplier *= heightScore;
-
-      airborneScores.Add(airborneScore);
-      directionScores.Add(directionScore);
-      speedSDScores.Add(speedSDScore);
-      averageSpeedScores.Add(averageSpeedScore);
-      accelSpikeScores.Add(accelSpikeScore);
       heightSDScores.Add(heightScore);
+
 
       NumSuccess++;
 
@@ -98,18 +102,64 @@ namespace Simulator
     private static int NumNoNewLineCollision { get; set; }
     private static int NumStalls { get; set; }
 
-    private static double GetAirborneScoresAverage() {return airborneScores.Average();}
-    private static double GetDirectionScoresAverage() {return directionScores.Average();}
-    private static double GetSpeedSDScoresAverage() {return speedSDScores.Average();}
-    private static double GetAverageSpeedScoresAverage() {return averageSpeedScores.Average();}
-    private static double GetAccelSpikeScoresAverage() {return accelSpikeScores.Average();}
-    private static double GetHeightSDScoresAverage() {return heightSDScores.Average();}
-    private static double GetAirborneScoresSD() {return GetStandardDeviation(airborneScores);}
-    private static double GetDirectionScoresSD() {return GetStandardDeviation(directionScores);}
-    private static double GetSpeedSDScoresSD() {return GetStandardDeviation(speedSDScores);}
-    private static double GetAverageSpeedScoresSD() {return GetStandardDeviation(averageSpeedScores);}
-    private static double GetAccelSpikeScoresSD() {return GetStandardDeviation(accelSpikeScores);}
-    private static double GetHeightSDScoresSD() {return GetStandardDeviation(heightSDScores);}
+
+    #region getters
+    private static double GetAirborneScoresAverage()
+    {
+      if (airborneScores.Count > 0) 
+        return airborneScores.Average();
+      return 0;
+    }
+    private static double GetDirectionScoresAverage()
+    {
+      if (directionScores.Count == 0) return 0;
+      return directionScores.Average();
+    }
+    private static double GetSpeedSDScoresAverage()
+    {
+      if (speedSDScores.Count == 0) return 0;
+      return speedSDScores.Average();
+    }
+    private static double GetAverageSpeedScoresAverage()
+    {
+      if (averageSpeedScores.Count == 0) return 0;
+      return averageSpeedScores.Average();
+    }
+    private static double GetAccelSpikeScoresAverage()
+    {
+      if (accelSpikeScores.Count == 0) return 0;
+      return accelSpikeScores.Average();
+    }
+    private static double GetHeightSDScoresAverage()
+    {
+      if (heightSDScores.Count == 0) return 0;
+      return heightSDScores.Average();
+    }
+    private static double GetAirborneScoresSD()
+    {
+      return GetStandardDeviation(airborneScores);
+    }
+    private static double GetDirectionScoresSD()
+    {
+      return GetStandardDeviation(directionScores);
+    }
+    private static double GetSpeedSDScoresSD()
+    {
+      return GetStandardDeviation(speedSDScores);
+    }
+    private static double GetAverageSpeedScoresSD()
+    {
+      return GetStandardDeviation(averageSpeedScores);
+    }
+    private static double GetAccelSpikeScoresSD()
+    {
+      return GetStandardDeviation(accelSpikeScores);
+    }
+    private static double GetHeightSDScoresSD()
+    {
+      return GetStandardDeviation(heightSDScores);
+    }
+    #endregion
 
     public static void ResetAllStats()
     {
@@ -130,6 +180,15 @@ namespace Simulator
     {
       Console.WriteLine();
       Console.WriteLine("-----------------------[Evaluation]-------------------------------");
+      Console.WriteLine();
+      Console.WriteLine($"Number of simulations:             {NumEvaluations}");
+      Console.WriteLine($"Number of successful runs:         {NumSuccess}");
+      Console.WriteLine($"Number of crashes:                 {NumCrashes}");
+      Console.WriteLine($"Number of stalls:                  {NumStalls}");
+      Console.WriteLine($"Number of new lines not touched:   {NumNoNewLineCollision}");
+      Console.WriteLine();
+      Console.WriteLine($"Sucess rate: {100 * (double)NumSuccess / (double)NumEvaluations}%");
+      Console.WriteLine();
       Console.WriteLine($"AirborneScoresAverage:      {GetAirborneScoresAverage()}");
       Console.WriteLine($"DirectionScoresAverage:     {GetDirectionScoresAverage()}");
       Console.WriteLine($"SpeedSDScoresAverage:       {GetSpeedSDScoresAverage()}");
@@ -142,15 +201,7 @@ namespace Simulator
       Console.WriteLine($"AverageSpeedScoresSD        {GetAverageSpeedScoresSD()}");
       Console.WriteLine($"AccelSpikeScoresSD:         {GetAccelSpikeScoresSD()}");
       Console.WriteLine($"GetHeightSDScoresSD:        {GetHeightSDScoresSD()}");
-
       Console.WriteLine();
-      Console.WriteLine($"Number of simulations:             {NumEvaluations}");
-      Console.WriteLine($"Number of successful runs:         {NumSuccess}");
-      Console.WriteLine($"Number of crashes:                 {NumCrashes}");
-      Console.WriteLine($"Number of stalls:                  {NumStalls}");
-      Console.WriteLine($"Number of new lines not touched:   {NumNoNewLineCollision}");
-      Console.WriteLine();
-      Console.WriteLine($"Sucess rate: {100 * (double)NumSuccess / (double)NumEvaluations}%");
       Console.WriteLine("-------------------------------------------------------------------");
       Console.WriteLine();
     }
@@ -200,6 +251,7 @@ namespace Simulator
 
     private static double GetStandardDeviation(List<double> doubleList)
     {
+      if (doubleList.Count == 0) return 0;
       double average = doubleList.Average();
       double sumOfSquaresOfDifferences = doubleList.Select(val => (val - average) * (val - average)).Sum();
       return Math.Sqrt(sumOfSquaresOfDifferences / (doubleList.Count - 1));

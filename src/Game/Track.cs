@@ -28,6 +28,7 @@ using linerider.Utils;
 using System.Diagnostics;
 using linerider.Audio;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace linerider
 {
@@ -42,6 +43,7 @@ namespace linerider
       }
       foreach (var line in other.LineLookup)
       {
+        // this is problematic if we want other types of lines
         var l = (StandardLine) line.Value;
         var newLine = l.Clone();
         this.LineLookup.Add(line.Key, newLine);
@@ -63,6 +65,9 @@ namespace linerider
       this.BlueLines = other.BlueLines;
       this.SceneryLines = other.SceneryLines;
       this.RedLines = other.RedLines;
+
+      // since this is not cloned it may cause issues
+      this.InitialState = other.InitialState;
     }
 
     public SimulationGrid Grid = new SimulationGrid();
@@ -72,6 +77,7 @@ namespace linerider
     public Dictionary<int, GameLine> LineLookup = new Dictionary<int, GameLine>();
     public List<GameTrigger> Triggers = new List<GameTrigger>();
 
+    public Rider? InitialState = null;
     public string Name = Constants.DefaultTrackName;
     public string Filename = null;
     public Song Song;
@@ -110,6 +116,13 @@ namespace linerider
     {
       GenerateBones();
     }
+
+    public void SetInitialState(Rider state)
+    {
+      InitialState = state;
+    }
+
+
     public GameLine[] GetLines()
     {
       GameLine[] ret = new GameLine[LineLookup.Count];
@@ -276,8 +289,18 @@ namespace linerider
     }
     public Rider GetStart()
     {
-      // TODO: update this to side-load a custom initial velocity
-      return Rider.Create(this.StartOffset, new Vector2d(ZeroStart ? 0 : RiderConstants.StartingMomentum, 0), Remount, frictionless);
+      if (InitialState != null)
+      {
+        return (Rider) InitialState;
+      }
+      else
+      {
+        return Rider.Create(
+          this.StartOffset, 
+          new Vector2d(ZeroStart ? 0 : RiderConstants.StartingMomentum, 0),
+          Remount,
+          frictionless);
+      }
     }
     public void SetVersion(int version)
     {
