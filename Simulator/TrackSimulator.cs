@@ -12,6 +12,7 @@ namespace Simulator
 {
   public static class TrackSimulator
   {
+    const int RESET_TIMEOUT = 200;
     public static Report Simulate(Track track, GameLine addedLine)
     {
       var result = new Report();
@@ -66,7 +67,7 @@ namespace Simulator
         else
           airborneCount = 0;
 
-        if (i > 500 && !r.freeFall && !result.crashed)
+        if (i > RESET_TIMEOUT && !r.freeFall && !result.crashed)
         {
           result.finalPosition = lastLocation; //  prevent off-by-one error
           break;

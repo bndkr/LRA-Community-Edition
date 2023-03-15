@@ -9,10 +9,212 @@ using System.Threading.Tasks;
 
 namespace Simulator
 {
+  abstract class EvalCriteria
+  {
+    public string Name;
+    public EvalCriteria(string name, double ideal, double width)
+    {
+      this.Name = name;
+      this.Ideal = ideal;
+      this.Width = width;
+    }
+
+    protected List<double> values = new List<double>();
+    protected List<double> scores = new List<double>();
+
+    public double Ideal;
+    public double Width;
+
+    public double GetAverageValue()
+    {
+      if (values.Count == 0) return 0;
+      return values.Average();
+    }
+    public double GetAverageScore()
+    {
+      if (scores.Count == 0) return 0;
+      return scores.Average();
+    }
+
+    public double GetValueSD()
+    {
+      if (values.Count == 0) return 0;
+      return GetStandardDeviation(values);
+    }
+    public double GetScoreSD()
+    {
+      if (scores.Count == 0) return 0;
+      return GetStandardDeviation(scores);
+    }
+
+    public abstract double EvaluateScore(List<TimestampReport> reports);
+
+    protected static double WeightTransferFunction(double width,
+                                                 double ideal,
+                                                 double input)
+    {
+      return Math.Exp(-Math.Pow((input - ideal) / width, 2.0));
+    }
+    protected static double GetStandardDeviation(List<double> doubleList)
+    {
+      if (doubleList.Count == 0) return 0;
+      double average = doubleList.Average();
+      double sumOfSquaresOfDifferences = doubleList.Select(val => (val - average) * (val - average)).Sum();
+      return Math.Sqrt(sumOfSquaresOfDifferences / (doubleList.Count - 1));
+    }
+  }
+  class AccelSpikeCritera : EvalCriteria
+  {
+    public AccelSpikeCritera(double ideal, double width)
+      : base("Acceleration Spikes", ideal, width) { }
+    public override double EvaluateScore(List<TimestampReport> reports)
+    {
+      double numSpikes = 0;
+      foreach (var time in reports)
+      {
+        var magnitude = time.acceleration.Mag();
+        if (magnitude > 1.8) numSpikes++;
+      }
+      var num = (numSpikes * 100) / (double)reports.Count;
+      this.values.Add(num);
+      var score = WeightTransferFunction(Width, Ideal, num);
+      this.scores.Add(score);
+      return score;
+    }
+  }
+  class AverageSpeed : EvalCriteria
+  {
+    public AverageSpeed(double ideal, double width) :
+      base("Average Speed", ideal, width)
+    { }
+    public override double EvaluateScore(List<TimestampReport> reports)
+    {
+      var velocities = new List<double>();
+      foreach (var report in reports)
+      {
+        velocities.Add(report.velocityMag);
+      }
+      var average = 0.0;
+      if (velocities.Count > 0)
+      {
+        average = velocities.Average();
+      }
+      this.values.Add(average);
+      var score = WeightTransferFunction(Width, Ideal, average);
+      this.scores.Add(score);
+      return score;
+    }
+  }
+  class SpeedSD : EvalCriteria
+  {
+    public SpeedSD(double ideal, double width) :
+      base("Standard Deviation of Speeds", ideal, width)
+    { }
+    public override double EvaluateScore(List<TimestampReport> reports)
+    {
+      var velocities = new List<double>();
+      foreach (var report in reports)
+      {
+        velocities.Add(report.velocityMag);
+      }
+      var sd = 0.0;
+      if (velocities.Count > 0)
+      {
+        sd = GetStandardDeviation(velocities);
+      }
+      this.values.Add(sd);
+      var score = WeightTransferFunction(Width, Ideal, sd);
+      this.scores.Add(score);
+      return score;
+    }
+  }
+  class DirectionSD : EvalCriteria
+  {
+    public DirectionSD(double ideal, double width) :
+      base("Standard Deviation of Directions", ideal, width)
+    { }
+    public override double EvaluateScore(List<TimestampReport> reports)
+    {
+      var directions = new List<double>();
+      foreach (var report in reports)
+      {
+        directions.Add(Math.Atan(report.velocity.y / report.velocity.x));
+      }
+      var sd = 0.0;
+      if (directions.Count > 0)
+      {
+        sd = GetStandardDeviation(directions);
+      }
+      this.values.Add(sd);
+      var score = WeightTransferFunction(Width, Ideal, sd);
+      this.scores.Add(score);
+      return score;
+    }
+  }
+  class TouchTransition : EvalCriteria
+  {
+    public TouchTransition(double ideal, double width) :
+      base("Touch Transition", ideal, width)
+    { }
+    public override double EvaluateScore(List<TimestampReport> reports)
+    {
+      double touchTransitions = 0;
+      bool last = reports[3].freeFall;
+      bool curr = reports[4].freeFall;
+      for (int i = 4; i < reports.Count; i++)
+      {
+        curr = reports[i].freeFall;
+        if (last != curr)
+          touchTransitions++;
+        last = curr;
+      }
+      var num = (100 * touchTransitions) / reports.Count;
+      this.values.Add(num);
+      var score = WeightTransferFunction(Width, Ideal, num);
+      this.scores.Add(score);
+      return score;
+    }
+  }
+  class HeightSD : EvalCriteria
+  {
+    public HeightSD(double ideal, double width)
+      : base("Height Standard Deviation", ideal, width) { }
+    public override double EvaluateScore(List<TimestampReport> reports)
+    {
+      var positions = new List<double>();
+      foreach (var timestamp in reports)
+      {
+        positions.Add(timestamp.position.y);
+      }
+      var num = GetStandardDeviation(positions);
+      this.values.Add(num);
+      var score = WeightTransferFunction(Width, Ideal, num);
+      this.scores.Add(score);
+      return score;
+    }
+  }
+
   public static class Evaluator
   {
+    static EvalCriteria[] criteria = new EvalCriteria[6];
+
+    private static void checkCriteriaInitialized()
+    {
+      if (criteria[0] == null)
+      {
+        criteria[0] = new AccelSpikeCritera(1,1);
+        criteria[1] = new AverageSpeed(12, 4);
+        criteria[2] = new SpeedSD(5, 2);
+        criteria[3] = new DirectionSD(2, 5);
+        criteria[4] = new TouchTransition(7, 3);
+        criteria[5] = new HeightSD(400, 75);
+      }
+    }
+    
     public static int calculateCost(Report report)
     {
+      checkCriteriaInitialized();
+
       NumEvaluations++;
       int maxInt = int.MaxValue;
       double multiplier = 1.0;
@@ -35,146 +237,25 @@ namespace Simulator
         return maxInt - 1;
       }
 
-      // calculate number of acc. spikes per 100 samples
-      var accelSpikeScore = WeightTransferFunction(1, 1, CountAccelerationSpikes(report.timestamps));
-      multiplier *= accelSpikeScore;
-      accelSpikeScores.Add(accelSpikeScore);
-
-
-      // we want a certain average speed
-      var velocityMagList = GetVelocityMagList(report.timestamps);
-      var averageSpeedScore = WeightTransferFunction(4, 9, velocityMagList.Average());
-      multiplier *= averageSpeedScore;
-      averageSpeedScores.Add(averageSpeedScore);
-
-
-      // we want a certain spread of speeds
-      var velocityStandardDeviation = GetStandardDeviation(velocityMagList);
-      var speedSDScore = WeightTransferFunction(2, 2, velocityStandardDeviation);
-      multiplier *= speedSDScore;
-      speedSDScores.Add(speedSDScore);
-
-      // we want the rider going all directions
-      var directionScore = WeightTransferFunction(5, 2, GetDirectionScore(report.timestamps));
-      multiplier *= directionScore;
-      directionScores.Add(directionScore);
-
-
-      // we want the rider going airborne often
-      var airborneScore = WeightTransferFunction(3, 7, GetTouchTransitionScore(report.timestamps));
-      multiplier *= airborneScore;
-      airborneScores.Add(airborneScore);
-
-
-      // we want great variation in height (y postion)
-      var heightScore = WeightTransferFunction(400, 750, GetHeightSD(report.timestamps));
-      multiplier *= heightScore;
-      heightSDScores.Add(heightScore);
-
+      foreach (var item in criteria)
+      {
+        if (item != null)
+        {
+          multiplier *= item.EvaluateScore(report.timestamps);
+        }
+      }
 
       NumSuccess++;
 
       var deducted = multiplier * maxInt;
-      return (int) (maxInt - deducted);
+      return (int)(maxInt - deducted);
     }
-
-    private static double GetHeightSD(List<TimestampReport> timestamps)
-    {
-      var result = new List<double>();
-      foreach (var timestamp in timestamps)
-      {
-        result.Add(timestamp.position.y);
-      }
-      return GetStandardDeviation(result);
-    }
-
-    private static List<double> airborneScores = new List<double>();
-    private static List<double> directionScores = new List<double>();
-    private static List<double> speedSDScores = new List<double>();
-    private static List<double> averageSpeedScores = new List<double>();
-    private static List<double> accelSpikeScores = new List<double>();
-    private static List<double> heightSDScores = new List<double>();
-
 
     private static int NumEvaluations { get; set; }
     private static int NumSuccess { get; set; }
     private static int NumCrashes { get; set; }
     private static int NumNoNewLineCollision { get; set; }
     private static int NumStalls { get; set; }
-
-
-    #region getters
-    private static double GetAirborneScoresAverage()
-    {
-      if (airborneScores.Count > 0) 
-        return airborneScores.Average();
-      return 0;
-    }
-    private static double GetDirectionScoresAverage()
-    {
-      if (directionScores.Count == 0) return 0;
-      return directionScores.Average();
-    }
-    private static double GetSpeedSDScoresAverage()
-    {
-      if (speedSDScores.Count == 0) return 0;
-      return speedSDScores.Average();
-    }
-    private static double GetAverageSpeedScoresAverage()
-    {
-      if (averageSpeedScores.Count == 0) return 0;
-      return averageSpeedScores.Average();
-    }
-    private static double GetAccelSpikeScoresAverage()
-    {
-      if (accelSpikeScores.Count == 0) return 0;
-      return accelSpikeScores.Average();
-    }
-    private static double GetHeightSDScoresAverage()
-    {
-      if (heightSDScores.Count == 0) return 0;
-      return heightSDScores.Average();
-    }
-    private static double GetAirborneScoresSD()
-    {
-      return GetStandardDeviation(airborneScores);
-    }
-    private static double GetDirectionScoresSD()
-    {
-      return GetStandardDeviation(directionScores);
-    }
-    private static double GetSpeedSDScoresSD()
-    {
-      return GetStandardDeviation(speedSDScores);
-    }
-    private static double GetAverageSpeedScoresSD()
-    {
-      return GetStandardDeviation(averageSpeedScores);
-    }
-    private static double GetAccelSpikeScoresSD()
-    {
-      return GetStandardDeviation(accelSpikeScores);
-    }
-    private static double GetHeightSDScoresSD()
-    {
-      return GetStandardDeviation(heightSDScores);
-    }
-    #endregion
-
-    public static void ResetAllStats()
-    {
-      airborneScores.Clear();
-      directionScores.Clear();
-      speedSDScores.Clear();
-      averageSpeedScores.Clear();
-      accelSpikeScores.Clear();
-
-      NumEvaluations = 0;
-      NumSuccess = 0;
-      NumCrashes = 0;
-      NumNoNewLineCollision = 0;
-      NumStalls = 0;
-    }
 
     public static void PrintStatistics()
     {
@@ -189,87 +270,28 @@ namespace Simulator
       Console.WriteLine();
       Console.WriteLine($"Sucess rate: {100 * (double)NumSuccess / (double)NumEvaluations}%");
       Console.WriteLine();
-      Console.WriteLine($"AirborneScoresAverage:      {GetAirborneScoresAverage()}");
-      Console.WriteLine($"DirectionScoresAverage:     {GetDirectionScoresAverage()}");
-      Console.WriteLine($"SpeedSDScoresAverage:       {GetSpeedSDScoresAverage()}");
-      Console.WriteLine($"AverageSpeedScoresAverage:  {GetAverageSpeedScoresAverage()}");
-      Console.WriteLine($"AccelSpikeScoresAverage:    {GetAccelSpikeScoresAverage()}");
-      Console.WriteLine($"GetHeightSDScoresAverage:   {GetHeightSDScoresAverage()}");
-      Console.WriteLine($"AirborneScoresSD:           {GetAirborneScoresSD()}");
-      Console.WriteLine($"DirectionScoresSD:          {GetDirectionScoresSD()}");
-      Console.WriteLine($"SpeedSDScoresSD:            {GetSpeedSDScoresSD()}");
-      Console.WriteLine($"AverageSpeedScoresSD        {GetAverageSpeedScoresSD()}");
-      Console.WriteLine($"AccelSpikeScoresSD:         {GetAccelSpikeScoresSD()}");
-      Console.WriteLine($"GetHeightSDScoresSD:        {GetHeightSDScoresSD()}");
+
+      Console.WriteLine("Criteria Name                     Average  Ideal    Width     Score");
+      foreach (var item in criteria)
+      {
+        if (item != null)
+        {
+          Console.WriteLine(
+            String.Format("{0,-33} {1,-10:N0} {2,-8:N0} {3,-8:N0} {4,-8:N0}",
+            item.Name,
+            item.GetAverageValue().ToString("0.00"),
+            item.Ideal,
+            item.Width,
+            item.GetAverageScore().ToString("0.00")
+            ));
+        }
+      }
       Console.WriteLine();
       Console.WriteLine("-------------------------------------------------------------------");
       Console.WriteLine();
     }
 
-    private static double WeightTransferFunction(double width,
-                                                 double ideal,
-                                                 double input)
-    {
-      return Math.Exp(-Math.Pow((input - ideal) / width, 2.0));
-    }
 
-    private static double CountAccelerationSpikes(List<TimestampReport> reports)
-    {
-      double numSpikes = 0;
-      foreach (var time in reports)
-      {
-        var magnitude = time.acceleration.Mag();
-        if (magnitude > 1.8) numSpikes++;
-      }
-      return (numSpikes * 100) / (double)reports.Count;
-    }
-
-    private static List<double> GetDirecitons(List<TimestampReport> reports)
-    {
-      var result = new List<double>();
-      foreach (var report in reports)
-      {
-        result.Add(Math.Atan(report.velocity.y / report.velocity.x));
-      }
-      return result;
-    }
-
-    private static double GetDirectionScore(List<TimestampReport> reports)
-    {
-      var directions = GetDirecitons(reports);
-      return GetStandardDeviation(directions);
-    }
-    private static List<double> GetVelocityMagList(List<TimestampReport> reports)
-    {
-      var velocities = new List<double>();
-      foreach (var report in reports)
-      {
-        velocities.Add(report.velocityMag);
-      }
-      return velocities;
-    }
-
-    private static double GetStandardDeviation(List<double> doubleList)
-    {
-      if (doubleList.Count == 0) return 0;
-      double average = doubleList.Average();
-      double sumOfSquaresOfDifferences = doubleList.Select(val => (val - average) * (val - average)).Sum();
-      return Math.Sqrt(sumOfSquaresOfDifferences / (doubleList.Count - 1));
-    }
-
-    private static double GetTouchTransitionScore(List<TimestampReport> reports)
-    {
-      double touchTransitions = 0;
-      bool last = reports[3].freeFall;
-      bool curr = reports[4].freeFall;
-      for (int i = 4; i < reports.Count; i++)
-      {
-        curr = reports[i].freeFall;
-        if (last != curr)
-          touchTransitions++;
-        last = curr;
-      }
-      return (100 * touchTransitions) / reports.Count;
-    }
+    
   }
 }

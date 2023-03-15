@@ -38,7 +38,7 @@ namespace Simulator
   }
   public class Program
   {
-    const int NUM_TRIES = 100;
+    const int NUM_TRIES = 80;
     const int NUM_LINES = 100;
 
     static void Main(string[] args)
@@ -60,8 +60,6 @@ namespace Simulator
 
       var lineage = new List<Track>();
       Report? winnerLastReport = null;
-
-      Evaluator.ResetAllStats();
 
       for (int i = 0; i < NUM_LINES; i++)
       {
