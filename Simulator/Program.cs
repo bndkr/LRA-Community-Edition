@@ -39,20 +39,24 @@ namespace Simulator
   public class Program
   {
     const int NUM_TRIES = 100;
-    const int NUM_LINES = 50;
+    const int NUM_LINES = 250;
 
     static void Main(string[] args)
     {
+      #region tests
       var test = new Test.TestClass();
-      test.TestTrackClone();
-      test.TestSimulator();
-      test.TestLineCreation();
+        test.TestTrackClone();
+        test.TestSimulator();
+        test.TestLineCreation();
+        test.TestTrackInitialState();
+      #endregion
 
       // generate the starter track
       var track = new Track();
       track.Name = "yeeoo";
       var startLine = new StandardLine(0, 20, 50, 100);
       track.AddLine(startLine);
+      Rider initialState = track.GetStart();
 
       var lineage = new List<Track>();
       Report? winnerLastReport = null;
@@ -66,6 +70,7 @@ namespace Simulator
         var reports = new Report[NUM_TRIES];
         var taskResults = new Task<TryTrackResult>[NUM_TRIES];
         var numFails = 0;
+        Rider? finalState;
 
         // launch simulations
         for (int j = 0; j < NUM_TRIES; j++)
@@ -77,7 +82,6 @@ namespace Simulator
         for (int j = 0; j < NUM_TRIES; j++)
         {
           taskResults[j].Wait();
-          // unpack results
           var result = taskResults[j].Result;
           possibleTracks[j] = result.resultTrack;
           scores[j] = result.score;
@@ -86,18 +90,23 @@ namespace Simulator
         }
 
         var winner = FindLowestCost(scores);
-        System.Console.WriteLine($"Line ({i+1}/{NUM_LINES}): Completed {NUM_TRIES} simulations, {numFails} failed. Sim #{winner} won.");
+        Console.WriteLine($"Line ({i+1}/{NUM_LINES}): Completed {NUM_TRIES} simulations, {numFails} failed. Sim #{winner} won.");
         track = possibleTracks[winner];
         lineage.Add(new Track(track));
         winnerLastReport = reports[winner];
-      }
-      TRKWriter.SaveTrack(track, "coolest");
-      // for (int i = 0; i < lineage.Count; i++)
-      // {
-      //   TRKWriter.SaveTrack(lineage[i], $"lin_{i}");
-      // }
 
-      // print stats
+        finalState = reports[winner].finalPosition;
+        if (finalState != null)
+        {
+          Console.WriteLine($"Resetting rider initial position after {reports[winner].timestamps.Count} timesteps");
+          track.InitialState = finalState;
+        }
+      }
+
+      // reset the track's initial position
+      track.InitialState = initialState;
+      TRKWriter.SaveTrack(track, "coolest");
+
       Evaluator.PrintStatistics();
     }
     private static int FindLowestCost(int[] scores)
@@ -132,7 +141,7 @@ namespace Simulator
     }
   }
 
-  class TryTrackParams
+  struct TryTrackParams
   {
     public TryTrackParams(Track lastWinner, int index, Report? winnerLastReport)
     {
@@ -145,11 +154,11 @@ namespace Simulator
     public Report? winnerLastReport;
   }
 
-  class TryTrackResult
+  struct TryTrackResult
   {
     public int score;
-    public Track? resultTrack;
-    public Report? report;
+    public Track resultTrack;
+    public Report report;
   }
 
 }

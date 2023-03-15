@@ -128,31 +128,31 @@ namespace Simulator
 
     public static void PrintStatistics()
     {
-      System.Console.WriteLine();
-      System.Console.WriteLine("-----------------------[Evaluation]-------------------------------");
-      System.Console.WriteLine($"AirborneScoresAverage:      {GetAirborneScoresAverage()}");
-      System.Console.WriteLine($"DirectionScoresAverage:     {GetDirectionScoresAverage()}");
-      System.Console.WriteLine($"SpeedSDScoresAverage:       {GetSpeedSDScoresAverage()}");
-      System.Console.WriteLine($"AverageSpeedScoresAverage:  {GetAverageSpeedScoresAverage()}");
-      System.Console.WriteLine($"AccelSpikeScoresAverage:    {GetAccelSpikeScoresAverage()}");
-      System.Console.WriteLine($"GetHeightSDScoresAverage:   {GetHeightSDScoresAverage()}");
-      System.Console.WriteLine($"AirborneScoresSD:           {GetAirborneScoresSD()}");
-      System.Console.WriteLine($"DirectionScoresSD:          {GetDirectionScoresSD()}");
-      System.Console.WriteLine($"SpeedSDScoresSD:            {GetSpeedSDScoresSD()}");
-      System.Console.WriteLine($"AverageSpeedScoresSD        {GetAverageSpeedScoresSD()}");
-      System.Console.WriteLine($"AccelSpikeScoresSD:         {GetAccelSpikeScoresSD()}");
-      System.Console.WriteLine($"GetHeightSDScoresSD:        {GetHeightSDScoresSD()}");
+      Console.WriteLine();
+      Console.WriteLine("-----------------------[Evaluation]-------------------------------");
+      Console.WriteLine($"AirborneScoresAverage:      {GetAirborneScoresAverage()}");
+      Console.WriteLine($"DirectionScoresAverage:     {GetDirectionScoresAverage()}");
+      Console.WriteLine($"SpeedSDScoresAverage:       {GetSpeedSDScoresAverage()}");
+      Console.WriteLine($"AverageSpeedScoresAverage:  {GetAverageSpeedScoresAverage()}");
+      Console.WriteLine($"AccelSpikeScoresAverage:    {GetAccelSpikeScoresAverage()}");
+      Console.WriteLine($"GetHeightSDScoresAverage:   {GetHeightSDScoresAverage()}");
+      Console.WriteLine($"AirborneScoresSD:           {GetAirborneScoresSD()}");
+      Console.WriteLine($"DirectionScoresSD:          {GetDirectionScoresSD()}");
+      Console.WriteLine($"SpeedSDScoresSD:            {GetSpeedSDScoresSD()}");
+      Console.WriteLine($"AverageSpeedScoresSD        {GetAverageSpeedScoresSD()}");
+      Console.WriteLine($"AccelSpikeScoresSD:         {GetAccelSpikeScoresSD()}");
+      Console.WriteLine($"GetHeightSDScoresSD:        {GetHeightSDScoresSD()}");
 
-      System.Console.WriteLine();
-      System.Console.WriteLine($"Number of simulations:             {NumEvaluations}");
-      System.Console.WriteLine($"Number of successful runs:         {NumSuccess}");
-      System.Console.WriteLine($"Number of crashes:                 {NumCrashes}");
-      System.Console.WriteLine($"Number of stalls:                  {NumStalls}");
-      System.Console.WriteLine($"Number of new lines not touched:   {NumNoNewLineCollision}");
-      System.Console.WriteLine();
-      System.Console.WriteLine($"Sucess rate: {100 * (double)NumSuccess / (double)NumEvaluations}%");
-      System.Console.WriteLine("-------------------------------------------------------------------");
-      System.Console.WriteLine();
+      Console.WriteLine();
+      Console.WriteLine($"Number of simulations:             {NumEvaluations}");
+      Console.WriteLine($"Number of successful runs:         {NumSuccess}");
+      Console.WriteLine($"Number of crashes:                 {NumCrashes}");
+      Console.WriteLine($"Number of stalls:                  {NumStalls}");
+      Console.WriteLine($"Number of new lines not touched:   {NumNoNewLineCollision}");
+      Console.WriteLine();
+      Console.WriteLine($"Sucess rate: {100 * (double)NumSuccess / (double)NumEvaluations}%");
+      Console.WriteLine("-------------------------------------------------------------------");
+      Console.WriteLine();
     }
 
     private static double WeightTransferFunction(double width,

@@ -24,6 +24,7 @@ namespace Simulator
       Vec2 acceleration= new Vec2(0, 0);
 
       Debug.Assert(track.GetLastAddedLine() == addedLine);
+      Rider lastLocation = timeline.GetFrame(0);
 
       int i = 1;
       int idleCount = 0;
@@ -63,11 +64,7 @@ namespace Simulator
 
         result.collidedWithNewLine |= timeline.HasCollidedWithLine(i, addedLine.ID);
         result.crashed |= (rider.Crashed || rider.SledBroken);
-
-        // if (timeline.IsFrameUniqueCollision(i))
-        // {
-        //   Console.WriteLine("unique collision");
-        // }
+        result.finalPosition = null;
 
         // freefall tracking
         if (IsInFreeFall(acceleration))
@@ -75,10 +72,17 @@ namespace Simulator
         else
           airborneCount = 0;
 
+        if (i > 500 && !r.freeFall && !result.crashed)
+        {
+          result.finalPosition = lastLocation; // off-by-one error
+          break;
+        }
 
+        lastLocation = rider;
         result.timestamps.Add(r);
         i++;
       }
+
       if (idleCount >= 5)
       {
         result.stopped = true;
@@ -89,7 +93,7 @@ namespace Simulator
     private static bool IsInFreeFall(Vec2 acceleration)
     {
       return Math.Abs(acceleration.y - 0.175) < 0.0001 &&
-             System.Math.Abs(acceleration.x) < 0.0001;
+             Math.Abs(acceleration.x) < 0.0001;
     }
 
     public static Vec2 CalculateVelocity(Vec2 initial, Vec2 curr)

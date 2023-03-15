@@ -1,4 +1,5 @@
-﻿using System;
+﻿using linerider.Game;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,7 @@ namespace Simulator
     public bool crashed = false;
     public bool collidedWithNewLine = false;
     public bool stopped;
+    public Rider? finalPosition = null;
 
     public bool PrintReport(string path)
     {

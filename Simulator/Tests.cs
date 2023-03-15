@@ -72,5 +72,22 @@ namespace Test
         r.NextDouble() * 100 - 50,
         r.NextDouble() * 100 - 50);
     }
+
+    public void TestTrackInitialState()
+    {
+      var track = new Track(); // track should have default initial state
+      track.AddLine(new StandardLine(0, 20, 200, 200));
+
+      var timeline = new Timeline(track);
+      var state = timeline.GetFrame(40); // calculate the rider's position
+
+      Track track2 = new Track(track);
+      track2.SetInitialState(state);
+
+
+      var timeline2 = new Timeline(track2);
+      var initialState = timeline2.GetFrame(0);
+
+    }
   }
 }
