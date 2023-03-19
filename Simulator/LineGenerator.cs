@@ -6,14 +6,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MathNet.Numerics.Distributions;
+using System.Runtime.CompilerServices;
 
 namespace Simulator
 {
   public static class LineGenerator
   {
-    public static GameLine AddLineToTrack(Track track, Report? winnerLastReport = null)
+    public static GameLine AddLineToTrack(Track track,
+                                          Report? winnerLastReport = null,
+                                          int? numTotalFails = null)
     {
       Random r = new Random();
+
 
       var winnerLastReportVel = 1.0;
       if (winnerLastReport != null)
@@ -22,7 +26,7 @@ namespace Simulator
       }
 
       var lastLine = (StandardLine) track.GetLastAddedLine();
-      var scale = lastLine.GetLength() / 2;
+      var scale = lastLine.GetLength() / 2.5; // this constant seems to control line length
 
       var lastPoint1 = new Vec2(lastLine.GetX1(), lastLine.GetY1());
       var lastPoint2 = new Vec2(lastLine.GetX2(), lastLine.GetY2());
@@ -146,7 +150,7 @@ namespace Simulator
 
     private static double GetScaledRandom(Random r, double length)
     {
-      return r.NextDouble() * length - (length / 2.5);
+      return r.NextDouble() * length - (length / 2);
     }
 
     private static Vec2 GetLineVec2(GameLine line)

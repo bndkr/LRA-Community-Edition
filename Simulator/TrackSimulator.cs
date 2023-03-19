@@ -12,8 +12,8 @@ namespace Simulator
 {
   public static class TrackSimulator
   {
-    const int RESET_TIMEOUT = 200;
-    public static Report Simulate(Track track, GameLine addedLine)
+    const int RESET_TIMEOUT = 100;
+    public static Report Simulate(Track track, GameLine addedLine, bool segment = true)
     {
       var result = new Report();
 
@@ -67,9 +67,9 @@ namespace Simulator
         else
           airborneCount = 0;
 
-        if (i > RESET_TIMEOUT && !r.freeFall && !result.crashed)
+        if (i > RESET_TIMEOUT && !r.freeFall && !result.crashed && segment)
         {
-          result.finalPosition = lastLocation; //  prevent off-by-one error
+          result.finalPosition = lastLocation; // prevent off-by-one error?
           break;
         }
 
@@ -106,11 +106,6 @@ namespace Simulator
     private static bool IsIdle(Vec2 velocity)
     {
       return velocity.Mag() < 0.05;
-    }
-
-    private static bool IsGoingTooFast(Vec2 velocity)
-    {
-      return velocity.Mag() > 15;
     }
   }
 }

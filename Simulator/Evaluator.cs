@@ -193,24 +193,46 @@ namespace Simulator
       return score;
     }
   }
+  class MinSpeed : EvalCriteria
+  {
+    public MinSpeed(double ideal, double width)
+      : base("Minimum Speed", ideal, width) { }
+    public override double EvaluateScore(List<TimestampReport> reports)
+    {
+      foreach (var time in reports)
+      {
+        if (time.velocityMag < 0.5) // TODO: try to detect stalling and reversing.
+          // with backpropagation, this should fix the stalling issue
+          return 0.01;
+      }
+      return 1;
+    }
+  }
 
   public static class Evaluator
   {
-    static EvalCriteria[] criteria = new EvalCriteria[6];
+    static List<EvalCriteria> criteria = new List<EvalCriteria>();
+
+    private static object m_lock = new object();
 
     private static void checkCriteriaInitialized()
     {
-      if (criteria[0] == null)
+      lock (m_lock)
       {
-        criteria[0] = new AccelSpikeCritera(1,1);
-        criteria[1] = new AverageSpeed(12, 4);
-        criteria[2] = new SpeedSD(5, 2);
-        criteria[3] = new DirectionSD(2, 5);
-        criteria[4] = new TouchTransition(7, 3);
-        criteria[5] = new HeightSD(400, 75);
+        if (criteria.Count == 0)
+        {
+          // create a sum acceleration criteria? (excluding freefall)
+          criteria.Add(new AccelSpikeCritera(1.5, 1));
+          criteria.Add(new AverageSpeed(9, 3));
+          criteria.Add(new SpeedSD(1, 1));
+          // criteria.Add(new DirectionSD(0.5, 0.2));
+          criteria.Add(new TouchTransition(7, 3));
+          // criteria.Add(new HeightSD(400, 75));
+          criteria.Add(new MinSpeed(0, 0)); // params unused
+        }
       }
     }
-    
+
     public static int calculateCost(Report report)
     {
       checkCriteriaInitialized();
@@ -280,8 +302,8 @@ namespace Simulator
             String.Format("{0,-33} {1,-10:N0} {2,-8:N0} {3,-8:N0} {4,-8:N0}",
             item.Name,
             item.GetAverageValue().ToString("0.00"),
-            item.Ideal,
-            item.Width,
+            item.Ideal.ToString(".0"),
+            item.Width.ToString(".0"),
             item.GetAverageScore().ToString("0.00")
             ));
         }

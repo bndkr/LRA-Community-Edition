@@ -43,18 +43,16 @@ namespace Simulator
 
     static void Main(string[] args)
     {
-      #region tests
-      var test = new Test.TestClass();
-        test.TestTrackClone();
-        test.TestSimulator();
-        test.TestLineCreation();
-        test.TestTrackInitialState();
-      #endregion
+      // var test = new Test.TestClass();
+      //   test.TestTrackClone();
+      //   test.TestSimulator();
+      //   test.TestLineCreation();
+      //   test.TestTrackInitialState();
 
       // generate the starter track
       var track = new Track();
       track.Name = "yeeoo";
-      var startLine = new StandardLine(0, 20, 50, 100);
+      var startLine = new StandardLine(0, 20, 75, 100);
       track.AddLine(startLine);
       Rider initialState = track.GetStart();
 
@@ -67,9 +65,8 @@ namespace Simulator
         var scores = new int[NUM_TRIES];
         var reports = new Report[NUM_TRIES];
         var taskResults = new Task<TryTrackResult>[NUM_TRIES];
-        var numFails = 0;
         Rider? finalState;
-
+        int numFails = 0;
         // launch simulations
         for (int j = 0; j < NUM_TRIES; j++)
         {
@@ -87,17 +84,26 @@ namespace Simulator
           if (result.score == int.MaxValue) numFails++;
         }
 
-        var winner = FindLowestCost(scores);
-        Console.WriteLine($"Line ({i+1}/{NUM_LINES}): Completed {NUM_TRIES} simulations, {numFails} failed. Sim #{winner} won.");
-        track = possibleTracks[winner];
-        lineage.Add(new Track(track));
-        winnerLastReport = reports[winner];
-
-        finalState = reports[winner].finalPosition;
-        if (finalState != null)
+        if (numFails < NUM_TRIES)
         {
-          Console.WriteLine($"Resetting rider initial position after {reports[winner].timestamps.Count} timesteps");
-          track.InitialState = finalState;
+
+          var winner = FindLowestCost(scores);
+          Console.WriteLine($"Line ({i + 1}/{NUM_LINES}): {NUM_TRIES - numFails}/{NUM_TRIES} simulations succeeded. Sim #{winner} won.");
+          track = possibleTracks[winner];
+          lineage.Add(new Track(track));
+          winnerLastReport = reports[winner];
+
+          finalState = reports[winner].finalPosition;
+          if (finalState != null)
+          {
+            Console.WriteLine($"Resetting rider initial position after {reports[winner].timestamps.Count} timesteps");
+            track.InitialState = finalState;
+          }
+        }
+        else
+        {
+          Console.WriteLine($"Line ({i + 1}/{NUM_LINES}): all simulations failed. Removing last line");
+          // track.RemoveLine(track.GetLastAddedLine());
         }
       }
 
@@ -122,8 +128,8 @@ namespace Simulator
     {
       Console.Write("Writing output report...");
       var lastLine = track.GetLastAddedLine();
-      var totalReport = TrackSimulator.Simulate(track, lastLine);
-      totalReport.PrintReport("report.csv");
+      var totalReport = TrackSimulator.Simulate(track, lastLine, false);
+      totalReport.PrintReport("../../../../report.csv");
       Console.WriteLine("done");
     }
 
